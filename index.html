@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON PRECISION V6 - AI AUTO</title>
+    <title>NEON PRECISION V7 - AUTO AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -37,7 +36,7 @@
 </head>
 <body class="min-h-screen p-4 font-sans selection:bg-neon-cyan/30">
 
-    <div class="max-w-5xl mx-auto space-y-6 pb-24">
+    <div class="max-w-5xl mx-auto space-y-6 pb-32">
         
         <!-- HEADER -->
         <header class="glass rounded-2xl p-6 relative overflow-hidden">
@@ -45,14 +44,11 @@
                 <div class="flex items-center gap-3">
                     <i data-lucide="cpu" class="text-neon-cyan w-8 h-8"></i>
                     <div>
-                        <h1 class="text-2xl font-bold tracking-widest">NEON <span class="text-neon-cyan">AUTO</span></h1>
+                        <h1 class="text-2xl font-bold tracking-widest">NEON <span class="text-neon-cyan">V7</span></h1>
                         <p class="text-xs text-gray-500 uppercase tracking-[0.2em]" id="game-mode-label">SISTEMA RULETA</p>
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="resetDealer()" class="p-3 bg-neon-amber/20 text-neon-amber rounded-xl hover:bg-neon-amber/40 border border-neon-amber/30" title="Cambio Crupier"><i data-lucide="rotate-ccw"></i></button>
-                    <button onclick="toggleSettings()" class="p-3 bg-white/10 rounded-xl hover:bg-white/20"><i data-lucide="settings"></i></button>
-                </div>
+                <button onclick="toggleSettings()" class="p-3 bg-white/10 rounded-xl hover:bg-white/20 border border-white/10"><i data-lucide="settings"></i></button>
             </div>
 
             <!-- STATS -->
@@ -69,9 +65,10 @@
                     <p class="text-xs text-gray-500 mb-1">STOP LOSS</p>
                     <p class="text-xl font-mono text-white" id="display-stop">$500</p>
                 </div>
-                <div class="glass p-4 rounded-xl">
-                    <p class="text-xs text-gray-500 mb-1">ESTRATEGIA</p>
-                    <p class="text-xl font-bold text-neon-amber" id="display-strategy">Nivel 1</p>
+                <div class="glass p-4 rounded-xl bg-neon-amber/10 border border-neon-amber/30">
+                    <p class="text-xs text-neon-amber mb-1 font-bold">APUESTA SUGERIDA</p>
+                    <p class="text-2xl font-bold text-white" id="display-bet">$0</p>
+                    <p class="text-[10px] text-gray-400" id="display-strategy-name">D'Alembert Nivel 1</p>
                 </div>
             </div>
 
@@ -88,18 +85,30 @@
         </header>
 
         <!-- SETTINGS MODAL -->
-        <div id="settings-panel" class="glass p-6 rounded-2xl hidden mb-6 border-l-4 border-neon-amber">
-            <h3 class="text-neon-amber font-bold mb-4">CONFIGURACIÓN</h3>
-            <div class="mb-4">
-                <label class="text-xs text-gray-400 block mb-1">GEMINI API KEY (Obligatorio)</label>
-                <input type="password" id="input-api-key" class="w-full bg-black/50 border border-white/20 rounded p-3 text-white text-sm" placeholder="Pega tu AIza... aquí">
+        <div id="settings-panel" class="glass p-6 rounded-2xl hidden mb-6 border-l-4 border-neon-amber animate-pulse-fast">
+            <h3 class="text-neon-amber font-bold mb-4 flex items-center gap-2"><i data-lucide="key"></i> CONFIGURACIÓN VITAL</h3>
+            
+            <div class="mb-6">
+                <label class="text-xs text-neon-cyan font-bold block mb-2">PEGAR API KEY DE GEMINI AQUÍ:</label>
+                <input type="text" id="input-api-key" class="w-full bg-black border border-neon-cyan/50 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-neon-cyan" placeholder="AIzaSy...">
+                <p class="text-[10px] text-gray-500 mt-1">La clave se guarda solo en tu dispositivo.</p>
             </div>
+
             <div class="grid grid-cols-3 gap-4 mb-4">
-                <input type="number" id="input-initial" class="bg-black/50 border border-white/20 rounded p-2 text-white" placeholder="Capital">
-                <input type="number" id="input-target" class="bg-black/50 border border-white/20 rounded p-2 text-white" placeholder="Meta">
-                <input type="number" id="input-stop" class="bg-black/50 border border-white/20 rounded p-2 text-white" placeholder="Stop Loss">
+                <div>
+                    <label class="text-xs text-gray-400">Capital</label>
+                    <input type="number" id="input-initial" class="w-full bg-white/5 border border-white/20 rounded p-2 text-white">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Meta</label>
+                    <input type="number" id="input-target" class="w-full bg-white/5 border border-white/20 rounded p-2 text-white">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Stop</label>
+                    <input type="number" id="input-stop" class="w-full bg-white/5 border border-white/20 rounded p-2 text-white">
+                </div>
             </div>
-            <button onclick="saveSettings()" class="w-full bg-neon-emerald/20 text-neon-emerald border border-neon-emerald py-3 rounded-xl font-bold hover:bg-neon-emerald/40">GUARDAR Y CONECTAR</button>
+            <button onclick="saveSettings()" class="w-full bg-neon-emerald text-black py-3 rounded-xl font-bold hover:bg-emerald-400 transition-all">GUARDAR Y CONECTAR</button>
         </div>
 
         <!-- GAME SWITCHER -->
@@ -124,10 +133,6 @@
                         <span class="text-xs text-gray-400">PROBABILIDAD</span><br>
                         <span id="ai-confidence" class="text-xl font-bold text-neon-cyan">0%</span>
                     </div>
-                    <div class="bg-white/10 px-3 py-1 rounded border border-white/10">
-                        <span class="text-xs text-gray-400">APUESTA</span><br>
-                        <span id="ai-bet" class="text-xl font-bold text-neon-amber">$0</span>
-                    </div>
                 </div>
                 <p id="ai-analysis" class="text-xs text-gray-400 italic border-t border-white/10 pt-2">...</p>
                 
@@ -150,6 +155,11 @@
         <div id="game-roulette" class="glass p-6 rounded-2xl">
             <div class="grid grid-cols-6 gap-2" id="roulette-grid"></div>
             <div class="mt-4 flex gap-1 overflow-x-auto pb-2" id="roulette-history"></div>
+            
+            <!-- BOTÓN CAMBIO CRUPIER -->
+            <button onclick="resetDealer()" class="w-full mt-4 py-3 bg-neon-amber/10 border border-neon-amber/50 text-neon-amber rounded-xl font-bold flex items-center justify-center gap-2">
+                <i data-lucide="rotate-ccw"></i> CAMBIO DE CRUPIER (RECALIBRAR)
+            </button>
         </div>
 
         <div id="game-baccarat" class="glass p-6 rounded-2xl hidden">
@@ -159,6 +169,11 @@
                 <button onclick="registerBaccarat('T')" class="bg-emerald-600 border-b-4 border-emerald-800 text-white font-black text-2xl rounded-xl active:border-b-0 active:translate-y-1">T</button>
             </div>
             <div class="mt-4 flex gap-2 overflow-x-auto pb-2" id="baccarat-history"></div>
+
+            <!-- BOTÓN NUEVO SHOE -->
+            <button onclick="resetDealer()" class="w-full mt-4 py-3 bg-neon-amber/10 border border-neon-amber/50 text-neon-amber rounded-xl font-bold flex items-center justify-center gap-2">
+                <i data-lucide="layers"></i> NUEVO SHOE (RECALIBRAR)
+            </button>
         </div>
 
     </div>
@@ -174,16 +189,16 @@
             roulette: {
                 history: [],
                 bankroll: { current: 1000, initial: 1000, target: 1500, stopLoss: 500 },
-                level: 1,
+                level: 1, // D'Alembert Level
                 losses: 0,
-                activePrediction: null, // Lo que dijo la IA
-                status: 'collecting', // collecting, calibrating (5), ghosting (10), active
+                activePrediction: null,
+                status: 'collecting', 
                 counter: 0
             },
             baccarat: {
                 history: [],
                 bankroll: { current: 1000, initial: 1000, target: 1500, stopLoss: 500 },
-                step: 0,
+                step: 0, // 1-3-2-4 Step (0=1, 1=3, 2=2, 3=4)
                 losses: 0,
                 activePrediction: null,
                 status: 'collecting',
@@ -209,19 +224,23 @@
 
             processStateLogic(s, 37);
 
-            // Verificar Predicción
+            // Verificar Predicción y Gestionar Dinero
             if (s.activePrediction !== null) {
                 const dozen = getDozen(num);
-                const bet = s.bankroll.current * 0.01 * s.level;
+                const bet = calculateBetAmount(s, 'roulette');
                 
                 if (dozen === s.activePrediction) {
-                    if (s.status === 'active') s.bankroll.current += bet * 2;
-                    s.level = Math.max(1, s.level - 1);
+                    if (s.status === 'active') {
+                        s.bankroll.current += bet * 2; // Paga 2:1
+                        s.level = Math.max(1, s.level - 1); // D'Alembert: Baja nivel al ganar
+                    }
                     s.losses = 0;
                     showToast(`✅ ACIERTO! ${s.status === 'active' ? '+$'+(bet*2).toFixed(0) : '(Virtual)'}`, 'success');
                 } else {
-                    if (s.status === 'active') s.bankroll.current -= bet;
-                    s.level = Math.min(10, s.level + 1);
+                    if (s.status === 'active') {
+                        s.bankroll.current -= bet;
+                        s.level = Math.min(10, s.level + 1); // D'Alembert: Sube nivel al perder
+                    }
                     s.losses++;
                     showToast(`❌ FALLO ${s.status === 'active' ? '-$'+bet.toFixed(0) : '(Virtual)'}`, 'error');
                     
@@ -230,7 +249,7 @@
                         showToast('⚠️ 3 FALLOS - RECALIBRANDO', 'warning');
                     }
                 }
-                s.activePrediction = null; // Limpiar predicción
+                s.activePrediction = null;
                 document.getElementById('ai-result-container').classList.add('hidden');
             }
 
@@ -246,17 +265,20 @@
             processStateLogic(s, 15);
 
             if (s.activePrediction !== null) {
-                const base = s.bankroll.current * 0.01;
-                const bet = base * SEQ_1324[s.step % 4];
+                const bet = calculateBetAmount(s, 'baccarat');
 
                 if (side === s.activePrediction) {
-                    if (s.status === 'active') s.bankroll.current += bet;
-                    s.step = (s.step + 1) % 4;
+                    if (s.status === 'active') {
+                        s.bankroll.current += bet; // Simplificado 1:1
+                        s.step = (s.step + 1) % 4; // 1-3-2-4: Avanza paso
+                    }
                     s.losses = 0;
                     showToast(`✅ ACIERTO!`, 'success');
                 } else if (side !== 'T') {
-                    if (s.status === 'active') s.bankroll.current -= bet;
-                    s.step = 0;
+                    if (s.status === 'active') {
+                        s.bankroll.current -= bet;
+                        s.step = 0; // 1-3-2-4: Reinicia al perder
+                    }
                     s.losses++;
                     showToast(`❌ FALLO`, 'error');
                     if (s.losses >= 3) { 
@@ -272,6 +294,15 @@
             updateUI();
         }
 
+        function calculateBetAmount(s, game) {
+            const baseUnit = s.bankroll.current * 0.01; // 1% del capital
+            if (game === 'roulette') {
+                return Math.floor(baseUnit * s.level);
+            } else {
+                return Math.floor(baseUnit * SEQ_1324[s.step % 4]);
+            }
+        }
+
         function processStateLogic(s, collectTarget) {
             if (s.status === 'collecting') {
                 if (s.history.length >= collectTarget) {
@@ -281,7 +312,7 @@
             } else if (s.status === 'calibrating') {
                 s.counter++;
                 if (s.counter >= 5) {
-                    s.status = 'ghosting'; // Pasa a ghosting tras calibrar
+                    s.status = 'ghosting';
                     s.counter = 0;
                 }
             } else if (s.status === 'ghosting') {
@@ -300,7 +331,7 @@
         }
 
         function resetDealer() {
-            if(!confirm("¿Cambio de Crupier? Se reiniciará la calibración.")) return;
+            if(!confirm("¿Cambio de Crupier/Shoe? Se reiniciará la calibración.")) return;
             const s = state.activeGame === 'roulette' ? state.roulette : state.baccarat;
             s.history = [];
             triggerCalibration(s);
@@ -309,7 +340,7 @@
 
         // --- IA GEMINI (DIRECTA) ---
         async function callGeminiAuto() {
-            if (!state.apiKey) { alert("Configura tu API KEY primero"); toggleSettings(); return; }
+            if (!state.apiKey) { alert("⚠️ PEGA TU API KEY EN AJUSTES PRIMERO"); toggleSettings(); return; }
             
             const btn = document.getElementById('btn-consult-ai');
             const originalText = btn.innerHTML;
@@ -319,7 +350,6 @@
             const isRoul = state.activeGame === 'roulette';
             const s = isRoul ? state.roulette : state.baccarat;
             
-            // Prompt Matemático
             const promptText = isRoul 
                 ? `Analiza estos números de ruleta: ${JSON.stringify(s.history)}. Usa Python para calcular frecuencias y chi-cuadrado. Responde SOLO este JSON: {"prediction": 1, "probability": 85, "analysis": "Tendencia clara"}. (Prediction es 1, 2 o 3 para docenas).`
                 : `Analiza estos resultados de Baccarat: ${JSON.stringify(s.history)}. Usa Python para detectar patrones. Responde SOLO este JSON: {"prediction": "P", "probability": 80, "analysis": "Racha detectada"}. (Prediction es P o B).`;
@@ -330,18 +360,15 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ parts: [{ text: promptText }] }],
-                        tools: [{ code_execution: {} }] // Activar Python
+                        tools: [{ code_execution: {} }]
                     })
                 });
 
                 const data = await response.json();
                 const text = data.candidates[0].content.parts[0].text;
-                
-                // Limpieza JSON
                 const jsonStr = text.replace(/```json|```/g, '').trim();
                 const result = JSON.parse(jsonStr);
 
-                // Mostrar Resultado
                 const container = document.getElementById('ai-result-container');
                 container.classList.remove('hidden');
                 
@@ -350,17 +377,9 @@
                 document.getElementById('ai-confidence').innerText = result.probability + '%';
                 document.getElementById('ai-analysis').innerText = result.analysis;
                 
-                // Calcular Apuesta
-                const bet = isRoul 
-                    ? (s.bankroll.current * 0.01 * s.level) 
-                    : (s.bankroll.current * 0.01 * SEQ_1324[s.step % 4]);
-                
-                document.getElementById('ai-bet').innerText = '$' + bet.toFixed(0);
-
-                // Guardar predicción para validación automática
+                // Guardar predicción
                 s.activePrediction = result.prediction;
                 
-                // Color según confianza
                 const confColor = result.probability > 75 ? 'text-neon-emerald' : 'text-neon-amber';
                 document.getElementById('ai-confidence').className = `text-xl font-bold ${confColor}`;
 
@@ -371,10 +390,11 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
                 saveState();
+                updateUI();
             }
         }
 
-        // --- UI ---
+        // --- UI RENDERING ---
         function updateUI() {
             const isRoul = state.activeGame === 'roulette';
             const s = isRoul ? state.roulette : state.baccarat;
@@ -392,7 +412,15 @@
             document.getElementById('display-balance').innerText = `$${s.bankroll.current.toFixed(0)}`;
             document.getElementById('display-target').innerText = `$${s.bankroll.target}`;
             document.getElementById('display-stop').innerText = `$${s.bankroll.stopLoss}`;
-            document.getElementById('display-strategy').innerText = isRoul ? `Nivel ${s.level}` : `Paso ${s.step + 1}`;
+            
+            // Mostrar Apuesta Calculada
+            const bet = calculateBetAmount(s, state.activeGame);
+            document.getElementById('display-bet').innerText = s.status === 'active' ? `$${bet}` : '$0 (Virtual)';
+            document.getElementById('display-bet').className = s.status === 'active' ? "text-2xl font-bold text-neon-emerald" : "text-2xl font-bold text-gray-500";
+            
+            document.getElementById('display-strategy-name').innerText = isRoul 
+                ? `D'Alembert Nivel ${s.level}` 
+                : `1-3-2-4 Paso ${s.step + 1}`;
 
             // Estado y Progreso
             let statusText = "", progress = 0, colorClass = "text-gray-400";
@@ -425,7 +453,7 @@
             // Botón IA
             const btnAi = document.getElementById('btn-consult-ai');
             const btnText = document.getElementById('btn-ai-text');
-            const canConsult = s.status === 'active' || s.status === 'ghosting'; // Permitir en ghosting para ver qué dice
+            const canConsult = s.status === 'active' || s.status === 'ghosting'; 
             
             btnAi.disabled = !canConsult;
             if (s.status === 'collecting') {
@@ -469,9 +497,9 @@
         function getDozen(n) { return n === 0 ? 0 : n <= 12 ? 1 : n <= 24 ? 2 : 3; }
         function switchGame(mode) { state.activeGame = mode; updateUI(); }
         
-        function saveState() { localStorage.setItem('neon_v6', JSON.stringify(state)); }
+        function saveState() { localStorage.setItem('neon_v7', JSON.stringify(state)); }
         function loadState() {
-            const saved = localStorage.getItem('neon_v6');
+            const saved = localStorage.getItem('neon_v7');
             if (saved) state = JSON.parse(saved);
             document.getElementById('input-api-key').value = state.apiKey || '';
         }
