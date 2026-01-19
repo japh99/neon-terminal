@@ -2,924 +2,975 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NEON PRECISION V18 - OFFLINE MASTER</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
         
         * {
-            font-family: 'Orbitron', monospace;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
         body {
+            font-family: 'Orbitron', monospace;
             background: #000;
+            color: #fff;
             overflow-x: hidden;
         }
-        
-        .glass-card {
-            background: rgba(0, 0, 0, 0.7);
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        .neon-cyan { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+        .neon-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+        .neon-crimson { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
         
-        .neon-text {
-            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
-        }
-        
-        .neon-border {
-            box-shadow: 0 0 15px currentColor, inset 0 0 15px rgba(255, 255, 255, 0.1);
-        }
-        
-        .chip-btn {
-            transition: all 0.2s ease;
+        .chip {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 3px solid;
             position: relative;
-            overflow: hidden;
         }
-        
-        .chip-btn:active {
+
+        .chip:active {
+            transform: scale(0.9);
+        }
+
+        .chip.selected {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .chip-1k { background: #1f2937; border-color: #374151; color: #fff; }
+        .chip-2.5k { background: #b45309; border-color: #d97706; color: #fff; }
+        .chip-5k { background: #0369a1; border-color: #0284c7; color: #fff; }
+        .chip-25k { background: #991b1b; border-color: #dc2626; color: #fff; }
+        .chip-100k { background: #065f46; border-color: #059669; color: #fff; }
+        .chip-500k { background: #1f2937; border-color: #6b7280; color: #fff; }
+        .chip-1.2m { background: #831843; border-color: #be185d; color: #fff; }
+        .chip-5m { background: #1e3a8a; border-color: #2563eb; color: #fff; }
+
+        .chip-500 { background: linear-gradient(135deg, #b45309 0%, #d97706 100%); border-color: #fbbf24; color: #fff; }
+        .chip-2500-r { background: linear-gradient(135deg, #b45309 0%, #92400e 100%); border-color: #d97706; color: #fff; }
+        .chip-5000 { background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%); border-color: #38bdf8; color: #fff; }
+        .chip-25000 { background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%); border-color: #f87171; color: #fff; }
+        .chip-100000 { background: linear-gradient(135deg, #064e3b 0%, #059669 100%); border-color: #34d399; color: #fff; }
+        .chip-500000 { background: linear-gradient(135deg, #1f2937 0%, #4b5563 100%); border-color: #9ca3af; color: #fff; }
+        .chip-1200000 { background: linear-gradient(135deg, #831843 0%, #be185d 100%); border-color: #f9a8d4; color: #fff; }
+        .chip-5000000 { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-color: #93c5fd; color: #fff; }
+
+        .number-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.15s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .number-btn:active {
             transform: scale(0.95);
         }
-        
-        .chip-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
+
+        .number-red {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border-color: #ef4444;
         }
-        
-        .chip-btn:active::before {
-            width: 100%;
-            height: 100%;
+
+        .number-black {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border-color: #374151;
         }
-        
+
+        .number-green {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border-color: #10b981;
+        }
+
         .pulse-animation {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: pulse 1s infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-        
+
         .slide-in {
             animation: slideIn 0.3s ease-out;
         }
-        
+
         @keyframes slideIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-        
-        .number-btn {
-            transition: all 0.15s ease;
-        }
-        
-        .number-btn:active {
-            transform: scale(0.9);
-            box-shadow: 0 0 20px currentColor;
-        }
-        
-        .result-chip {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin: 2px;
-        }
-        
-        .chip-selector {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 10px;
-        }
-        
-        .chip-img {
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-        }
-        
-        .chip-img:hover {
-            transform: scale(1.1);
-        }
-        
-        .chip-img.selected {
-            border-color: #06b6d4;
-            box-shadow: 0 0 15px #06b6d4;
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
     </style>
 </head>
-<body class="min-h-screen p-4">
-    <div class="max-w-6xl mx-auto">
-        <!-- HEADER -->
-        <div class="glass-card rounded-2xl p-6 mb-6 text-center">
-            <h1 class="text-4xl md:text-5xl font-black text-cyan-400 neon-text mb-2">NEON PRECISION V18</h1>
-            <p class="text-emerald-400 text-sm md:text-base">OFFLINE MASTER - ALGORITMO MATEMÁTICO PURO</p>
-        </div>
+<body class="min-h-screen">
+    <!-- Header -->
+    <div class="glass border-b border-cyan-500/30 px-4 py-3 sticky top-0 z-50">
+        <h1 class="text-2xl md:text-3xl font-black text-center bg-gradient-to-r from-cyan-400 via-emerald-400 to-pink-400 bg-clip-text text-transparent">
+            NEON PRECISION V18
+        </h1>
+        <p class="text-center text-xs text-gray-400 mt-1">OFFLINE MASTER • ZERO LATENCY</p>
+    </div>
 
-        <!-- MODO SELECTOR -->
-        <div class="glass-card rounded-2xl p-6 mb-6">
-            <div class="grid grid-cols-2 gap-4">
-                <button id="modeRoulette" class="p-6 rounded-xl neon-border text-cyan-400 border-2 border-cyan-400 font-bold text-lg md:text-xl hover:bg-cyan-400 hover:text-black transition-all">
-                    <i data-lucide="disc" class="w-8 h-8 mx-auto mb-2"></i>
-                    RULETA
-                </button>
-                <button id="modeBaccarat" class="p-6 rounded-xl neon-border text-emerald-400 border-2 border-emerald-400 font-bold text-lg md:text-xl hover:bg-emerald-400 hover:text-black transition-all">
-                    <i data-lucide="spade" class="w-8 h-8 mx-auto mb-2"></i>
-                    BACCARAT
-                </button>
-            </div>
-        </div>
-
-        <!-- CONFIGURACIÓN INICIAL -->
-        <div id="configPanel" class="glass-card rounded-2xl p-6 mb-6">
-            <h2 class="text-2xl font-bold text-white mb-4">CONFIGURACIÓN</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="text-cyan-400 text-sm mb-2 block">CAPITAL INICIAL</label>
-                    <input type="number" id="capitalInput" class="w-full bg-black/50 border-2 border-cyan-400 rounded-lg p-3 text-white text-lg" placeholder="100000">
-                </div>
-                <div>
-                    <label class="text-emerald-400 text-sm mb-2 block">META ($)</label>
-                    <input type="number" id="metaInput" class="w-full bg-black/50 border-2 border-emerald-400 rounded-lg p-3 text-white text-lg" placeholder="150000">
-                </div>
-                <div>
-                    <label class="text-red-400 text-sm mb-2 block">STOP LOSS ($)</label>
-                    <input type="number" id="stopLossInput" class="w-full bg-black/50 border-2 border-red-400 rounded-lg p-3 text-white text-lg" placeholder="80000">
-                </div>
-            </div>
-            <button id="startBtn" class="w-full mt-4 bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-bold py-4 rounded-xl text-xl hover:shadow-2xl transition-all">
-                INICIAR SESIÓN
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto p-2 md:p-4">
+        <!-- Game Selector -->
+        <div class="flex gap-2 mb-4">
+            <button id="btnRoulette" class="flex-1 py-4 rounded-xl font-bold text-lg glass neon-crimson" onclick="switchGame('roulette')">
+                🎯 RULETA
+            </button>
+            <button id="btnBaccarat" class="flex-1 py-4 rounded-xl font-bold text-lg glass" onclick="switchGame('baccarat')">
+                🃏 BACCARAT
             </button>
         </div>
 
-        <!-- PANEL DE JUEGO -->
-        <div id="gamePanel" class="hidden">
-            <!-- DASHBOARD -->
-            <div class="glass-card rounded-2xl p-6 mb-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div>
-                        <p class="text-cyan-400 text-sm mb-1">CAPITAL</p>
-                        <p id="currentCapital" class="text-white text-2xl font-bold">$0</p>
-                    </div>
-                    <div>
-                        <p class="text-emerald-400 text-sm mb-1">GANANCIA</p>
-                        <p id="profitDisplay" class="text-emerald-400 text-2xl font-bold">$0</p>
-                    </div>
-                    <div>
-                        <p class="text-yellow-400 text-sm mb-1">FASE</p>
-                        <p id="phaseDisplay" class="text-yellow-400 text-xl font-bold">RECOLECCIÓN</p>
-                    </div>
-                    <div>
-                        <p class="text-purple-400 text-sm mb-1">DATOS</p>
-                        <p id="dataCount" class="text-purple-400 text-2xl font-bold">0</p>
-                    </div>
+        <!-- Status Panel -->
+        <div id="statusPanel" class="glass rounded-xl p-4 mb-4 slide-in"></div>
+
+        <!-- Configuration Panel (Hidden by default) -->
+        <div id="configPanel" class="glass rounded-xl p-4 mb-4 hidden">
+            <h3 class="text-lg font-bold mb-3 text-cyan-400">⚙️ CONFIGURACIÓN</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                    <label class="text-sm text-gray-400">Capital Inicial</label>
+                    <input type="number" id="inputCapital" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 text-white" value="1000000">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-400">Meta</label>
+                    <input type="number" id="inputTarget" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 text-white" value="1500000">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-400">Stop Loss</label>
+                    <input type="number" id="inputStopLoss" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 text-white" value="500000">
                 </div>
             </div>
+            <button onclick="applyConfig()" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 py-2 rounded-lg font-bold">
+                APLICAR
+            </button>
+        </div>
 
-            <!-- PREDICCIÓN -->
-            <div id="predictionPanel" class="glass-card rounded-2xl p-6 mb-6 hidden">
-                <h2 class="text-2xl font-bold text-cyan-400 mb-4 text-center">ANÁLISIS MATEMÁTICO</h2>
-                <div class="bg-black/50 rounded-xl p-6 mb-4">
-                    <div class="text-center mb-4">
-                        <p class="text-white text-sm mb-2">PREDICCIÓN</p>
-                        <p id="predictionValue" class="text-4xl font-black text-cyan-400 neon-text">---</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="text-center">
-                            <p class="text-emerald-400 text-sm mb-1">CONFIANZA</p>
-                            <p id="confidenceValue" class="text-2xl font-bold text-white">0%</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-yellow-400 text-sm mb-1">APUESTA</p>
-                            <p id="betValue" class="text-2xl font-bold text-white">ESPERAR</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- SELECTOR DE FICHAS -->
-                <div id="chipSelectorPanel" class="hidden">
-                    <p class="text-center text-white mb-3 text-sm">SELECCIONA TUS FICHAS (Click para seleccionar/deseleccionar)</p>
-                    <div class="chip-selector" id="chipSelector"></div>
-                    <div class="text-center mt-4">
-                        <p class="text-cyan-400 text-sm mb-2">TOTAL SELECCIONADO</p>
-                        <p id="totalSelected" class="text-3xl font-bold text-white">$0</p>
-                    </div>
-                </div>
-            </div>
+        <!-- Prediction Panel -->
+        <div id="predictionPanel" class="glass rounded-xl p-4 mb-4"></div>
 
-            <!-- INPUT PANEL -->
-            <div class="glass-card rounded-2xl p-6 mb-6">
-                <h3 class="text-xl font-bold text-white mb-4 text-center">INGRESO DE RESULTADOS</h3>
-                
-                <!-- RULETA -->
-                <div id="rouletteInput" class="hidden">
-                    <div class="grid grid-cols-6 md:grid-cols-9 gap-2 mb-4">
-                        <!-- Números 0-36 generados dinámicamente -->
-                    </div>
-                </div>
+        <!-- Chips Panel -->
+        <div id="chipsPanel" class="glass rounded-xl p-4 mb-4"></div>
 
-                <!-- BACCARAT -->
-                <div id="baccaratInput" class="hidden">
-                    <div class="grid grid-cols-3 gap-4">
-                        <button class="number-btn bg-blue-600 text-white p-6 rounded-xl font-bold text-xl neon-border border-2 border-blue-400" data-result="P">
-                            PLAYER
-                        </button>
-                        <button class="number-btn bg-red-600 text-white p-6 rounded-xl font-bold text-xl neon-border border-2 border-red-400" data-result="B">
-                            BANKER
-                        </button>
-                        <button class="number-btn bg-green-600 text-white p-6 rounded-xl font-bold text-xl neon-border border-2 border-green-400" data-result="T">
-                            TIE
-                        </button>
-                    </div>
-                </div>
+        <!-- Game Interface -->
+        <div id="gameInterface" class="glass rounded-xl p-4 mb-4"></div>
 
-                <button id="undoBtn" class="w-full mt-4 bg-yellow-600 text-black font-bold py-3 rounded-xl hover:bg-yellow-500 transition-all">
-                    DESHACER ÚLTIMO
-                </button>
-            </div>
+        <!-- Control Buttons -->
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <button onclick="toggleConfig()" class="glass py-3 rounded-xl font-bold">
+                ⚙️ CONFIG
+            </button>
+            <button onclick="changeCroupier()" class="glass py-3 rounded-xl font-bold text-amber-400">
+                🔄 CAMBIO CRUPIER
+            </button>
+        </div>
 
-            <!-- HISTORIAL -->
-            <div class="glass-card rounded-2xl p-6 mb-6">
-                <h3 class="text-xl font-bold text-white mb-4">HISTORIAL</h3>
-                <div id="historyDisplay" class="flex flex-wrap gap-2 min-h-[60px]"></div>
-            </div>
-
-            <!-- CONTROLES -->
-            <div class="grid grid-cols-2 gap-4">
-                <button id="resetShoeBtn" class="glass-card p-4 rounded-xl text-yellow-400 font-bold hover:bg-yellow-400 hover:text-black transition-all">
-                    <i data-lucide="refresh-cw" class="w-6 h-6 mx-auto mb-2"></i>
-                    CAMBIO CRUPIER/SHOE
-                </button>
-                <button id="endSessionBtn" class="glass-card p-4 rounded-xl text-red-400 font-bold hover:bg-red-400 hover:text-black transition-all">
-                    <i data-lucide="power" class="w-6 h-6 mx-auto mb-2"></i>
-                    FINALIZAR SESIÓN
-                </button>
-            </div>
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-2">
+            <button onclick="resetSession()" class="bg-red-600/20 border border-red-500 py-3 rounded-xl font-bold text-red-400">
+                🗑️ FINALIZAR SESIÓN
+            </button>
+            <button onclick="exportData()" class="bg-blue-600/20 border border-blue-500 py-3 rounded-xl font-bold text-blue-400">
+                📊 EXPORTAR
+            </button>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // CORE ENGINE - NEON PRECISION V18
-        // ============================================
+        // ============ ESTADO GLOBAL ============
+        let currentGame = 'roulette';
+        let state = {
+            roulette: {
+                capital: 1000000,
+                initialCapital: 1000000,
+                target: 1500000,
+                stopLoss: 500000,
+                history: [],
+                phase: 'collecting', // collecting, ghosting, active, recalibrating
+                collectionCount: 0,
+                ghostCount: 0,
+                recalibrationCount: 0,
+                dalembertLevel: 1,
+                consecutiveLosses: 0,
+                wins: 0,
+                losses: 0,
+                prediction: null,
+                confidence: 0,
+                selectedChips: []
+            },
+            baccarat: {
+                capital: 1000000,
+                initialCapital: 1000000,
+                target: 1500000,
+                stopLoss: 500000,
+                history: [],
+                phase: 'collecting',
+                collectionCount: 0,
+                ghostCount: 0,
+                recalibrationCount: 0,
+                sequencePosition: 0, // 1-3-2-4
+                consecutiveLosses: 0,
+                wins: 0,
+                losses: 0,
+                prediction: null,
+                confidence: 0,
+                selectedChips: []
+            }
+        };
+
+        // Constantes
+        const REDS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+        const SEQUENCE_1324 = [1, 3, 2, 4];
         
-        class NeonPrecisionEngine {
-            constructor() {
-                this.mode = null;
-                this.phase = 'RECOLECCIÓN';
-                this.history = [];
-                this.ghostHistory = [];
-                this.ghostPredictions = [];
-                this.capital = 0;
-                this.initialCapital = 0;
-                this.meta = 0;
-                this.stopLoss = 0;
-                this.consecutiveLosses = 0;
-                this.betSequence = [1, 3, 2, 4];
-                this.currentBetIndex = 0;
-                this.dAlembertLevel = 1;
-                this.selectedChips = [];
-                
-                this.loadState();
-            }
-
-            saveState() {
-                const state = {
-                    mode: this.mode,
-                    phase: this.phase,
-                    history: this.history,
-                    ghostHistory: this.ghostHistory,
-                    ghostPredictions: this.ghostPredictions,
-                    capital: this.capital,
-                    initialCapital: this.initialCapital,
-                    meta: this.meta,
-                    stopLoss: this.stopLoss,
-                    consecutiveLosses: this.consecutiveLosses,
-                    currentBetIndex: this.currentBetIndex,
-                    dAlembertLevel: this.dAlembertLevel
-                };
-                localStorage.setItem('neonPrecisionState', JSON.stringify(state));
-            }
-
-            loadState() {
-                const saved = localStorage.getItem('neonPrecisionState');
-                if (saved) {
-                    const state = JSON.parse(saved);
-                    Object.assign(this, state);
-                }
-            }
-
-            clearState() {
-                localStorage.removeItem('neonPrecisionState');
-            }
-
-            setMode(mode) {
-                this.mode = mode;
-                this.phase = 'RECOLECCIÓN';
-                this.history = [];
-                this.ghostHistory = [];
-                this.ghostPredictions = [];
-                this.consecutiveLosses = 0;
-                this.saveState();
-            }
-
-            setCapital(capital, meta, stopLoss) {
-                this.capital = capital;
-                this.initialCapital = capital;
-                this.meta = meta;
-                this.stopLoss = stopLoss;
-                this.saveState();
-            }
-
-            addResult(result) {
-                if (this.phase === 'RECOLECCIÓN') {
-                    this.history.push(result);
-                    
-                    const required = this.mode === 'roulette' ? 37 : 15;
-                    if (this.history.length >= required) {
-                        this.phase = 'CALIBRACIÓN';
-                        this.ghostHistory = [];
-                    }
-                } else if (this.phase === 'CALIBRACIÓN') {
-                    this.ghostHistory.push(result);
-                    
-                    const prediction = this.getPrediction();
-                    this.ghostPredictions.push({
-                        predicted: prediction.value,
-                        actual: result,
-                        correct: this.checkPrediction(prediction.value, result)
-                    });
-                    
-                    if (this.ghostHistory.length >= 10) {
-                        const accuracy = this.calculateGhostAccuracy();
-                        const currentConfidence = this.getPrediction().confidence;
-                        
-                        if (accuracy >= 60 && currentConfidence >= 75) {
-                            this.phase = 'FUEGO_REAL';
-                            this.consecutiveLosses = 0;
-                        } else {
-                            this.history.push(result);
-                        }
-                    }
-                } else if (this.phase === 'FUEGO_REAL') {
-                    const prediction = this.getPrediction();
-                    const won = this.checkPrediction(prediction.value, result);
-                    
-                    this.history.push(result);
-                    
-                    if (won) {
-                        const betAmount = this.calculateBetAmount();
-                        const profit = this.calculateProfit(betAmount, prediction.value);
-                        this.capital += profit;
-                        this.consecutiveLosses = 0;
-                        
-                        if (this.mode === 'baccarat') {
-                            this.currentBetIndex = Math.min(this.currentBetIndex + 1, 3);
-                        } else {
-                            this.dAlembertLevel = Math.max(1, this.dAlembertLevel - 1);
-                        }
-                    } else {
-                        const betAmount = this.calculateBetAmount();
-                        this.capital -= betAmount;
-                        this.consecutiveLosses++;
-                        
-                        if (this.mode === 'baccarat') {
-                            this.currentBetIndex = 0;
-                        } else {
-                            this.dAlembertLevel++;
-                        }
-                        
-                        if (this.consecutiveLosses >= 3) {
-                            this.phase = 'RECALIBRACIÓN';
-                            this.ghostHistory = [];
-                            this.ghostPredictions = [];
-                        }
-                    }
-                    
-                    if (this.capital >= this.meta) {
-                        alert('🎉 META ALCANZADA! Has logrado tu objetivo.');
-                    }
-                    if (this.capital <= this.stopLoss) {
-                        alert('⚠️ STOP LOSS ACTIVADO! Detén las operaciones.');
-                    }
-                } else if (this.phase === 'RECALIBRACIÓN') {
-                    this.ghostHistory.push(result);
-                    
-                    const prediction = this.getPrediction();
-                    this.ghostPredictions.push({
-                        predicted: prediction.value,
-                        actual: result,
-                        correct: this.checkPrediction(prediction.value, result)
-                    });
-                    
-                    if (this.ghostHistory.length >= 10) {
-                        const accuracy = this.calculateGhostAccuracy();
-                        const currentConfidence = this.getPrediction().confidence;
-                        
-                        if (accuracy >= 60 && currentConfidence >= 75) {
-                            this.phase = 'FUEGO_REAL';
-                            this.consecutiveLosses = 0;
-                        } else {
-                            this.history.push(result);
-                        }
-                    }
-                }
-                
-                this.saveState();
-            }
-
-            checkPrediction(predicted, actual) {
-                if (this.mode === 'roulette') {
-                    if (actual === 0) return false;
-                    
-                    if (typeof predicted === 'string' && predicted.includes('DOCENA')) {
-                        const dozen = parseInt(predicted.split(' ')[1]);
-                        if (dozen === 1) return actual >= 1 && actual <= 12;
-                        if (dozen === 2) return actual >= 13 && actual <= 24;
-                        if (dozen === 3) return actual >= 25 && actual <= 36;
-                    }
-                    return predicted === actual;
-                } else {
-                    if (actual === 'T') return false;
-                    return predicted === actual;
-                }
-            }
-
-            calculateGhostAccuracy() {
-                if (this.ghostPredictions.length === 0) return 0;
-                const correct = this.ghostPredictions.filter(p => p.correct).length;
-                return (correct / this.ghostPredictions.length) * 100;
-            }
-
-            getPrediction() {
-                if (this.mode === 'roulette') {
-                    return this.analyzeRoulette();
-                } else {
-                    return this.analyzeBaccarat();
-                }
-            }
-
-            analyzeRoulette() {
-                const recentData = [...this.history, ...this.ghostHistory].slice(-37);
-                
-                if (recentData.length < 20) {
-                    return { value: null, confidence: 0 };
-                }
-
-                const dozens = { 1: 0, 2: 0, 3: 0 };
-                
-                recentData.forEach(num => {
-                    if (num >= 1 && num <= 12) dozens[1]++;
-                    else if (num >= 13 && num <= 24) dozens[2]++;
-                    else if (num >= 25 && num <= 36) dozens[3]++;
-                });
-
-                const expected = recentData.filter(n => n !== 0).length / 3;
-                let maxDeviation = 0;
-                let bestDozen = 1;
-
-                for (let i = 1; i <= 3; i++) {
-                    const deviation = dozens[i] - expected;
-                    if (deviation > maxDeviation) {
-                        maxDeviation = deviation;
-                        bestDozen = i;
-                    }
-                }
-
-                const confidence = Math.min(95, 50 + (maxDeviation / expected) * 100);
-
-                return {
-                    value: `DOCENA ${bestDozen}`,
-                    confidence: Math.round(confidence),
-                    type: 'dozen'
-                };
-            }
-
-            analyzeBaccarat() {
-                const recentData = [...this.history, ...this.ghostHistory].slice(-15);
-                
-                if (recentData.length < 8) {
-                    return { value: null, confidence: 0 };
-                }
-
-                const patterns = this.detectBaccaratPatterns(recentData);
-                const count = { P: 0, B: 0, T: 0 };
-                recentData.forEach(r => count[r]++);
-
-                let prediction = null;
-                let confidence = 0;
-
-                const lastThree = recentData.slice(-3);
-                if (lastThree.every(r => r === 'P')) {
-                    prediction = 'B';
-                    confidence = 75;
-                } else if (lastThree.every(r => r === 'B')) {
-                    prediction = 'P';
-                    confidence = 75;
-                } else {
-                    const zigzag = this.isZigZag(recentData.slice(-6));
-                    if (zigzag) {
-                        const last = recentData[recentData.length - 1];
-                        prediction = last === 'P' ? 'B' : 'P';
-                        confidence = 80;
-                    } else {
-                        if (count.P < count.B) {
-                            prediction = 'P';
-                            confidence = 65;
-                        } else {
-                            prediction = 'B';
-                            confidence = 65;
-                        }
-                    }
-                }
-
-                return {
-                    value: prediction,
-                    confidence: Math.round(confidence),
-                    type: 'side'
-                };
-            }
-
-            detectBaccaratPatterns(data) {
-                return {
-                    zigzag: this.isZigZag(data),
-                    streak: this.detectStreak(data)
-                };
-            }
-
-            isZigZag(data) {
-                if (data.length < 4) return false;
-                for (let i = 0; i < data.length - 1; i++) {
-                    if (data[i] === data[i + 1]) return false;
-                }
-                return true;
-            }
-
-            detectStreak(data) {
-                let current = data[data.length - 1];
-                let count = 1;
-                for (let i = data.length - 2; i >= 0; i--) {
-                    if (data[i] === current) count++;
-                    else break;
-                }
-                return count;
-            }
-
-            calculateBetAmount() {
-                const baseUnit = this.capital * 0.01;
-                
-                if (this.mode === 'roulette') {
-                    return Math.round(baseUnit * this.dAlembertLevel);
-                } else {
-                    return Math.round(baseUnit * this.betSequence[this.currentBetIndex]);
-                }
-            }
-
-            calculateProfit(betAmount, prediction) {
-                if (this.mode === 'roulette') {
-                    return betAmount * 2;
-                } else {
-                    if (prediction === 'P') {
-                        return betAmount * 1.0;
-                    } else {
-                        return betAmount * 0.95;
-                    }
-                }
-            }
-
-            undoLast() {
-                if (this.phase === 'RECOLECCIÓN' && this.history.length > 0) {
-                    this.history.pop();
-                } else if (this.phase === 'CALIBRACIÓN' && this.ghostHistory.length > 0) {
-                    this.ghostHistory.pop();
-                    this.ghostPredictions.pop();
-                } else if ((this.phase === 'FUEGO_REAL' || this.phase === 'RECALIBRACIÓN') && this.history.length > 0) {
-                    this.history.pop();
-                }
-                this.saveState();
-            }
-
-            resetShoe() {
-                const currentCapital = this.capital;
-                this.history = [];
-                this.ghostHistory = [];
-                this.ghostPredictions = [];
-                this.phase = 'RECOLECCIÓN';
-                this.consecutiveLosses = 0;
-                this.currentBetIndex = 0;
-                this.dAlembertLevel = 1;
-                this.capital = currentCapital;
-                this.saveState();
-            }
-
-            getChipRecommendation(betAmount) {
-                const chips = this.mode === 'baccarat' 
-                    ? [500, 2500, 5000, 25000, 100000, 500000, 1000000, 5000000]
-                    : [5, 25, 100, 500, 1000, 5000, 25000, 100000];
-                
-                let remaining = betAmount;
-                const selected = [];
-                
-                for (let i = chips.length - 1; i >= 0; i--) {
-                    while (remaining >= chips[i]) {
-                        selected.push(chips[i]);
-                        remaining -= chips[i];
-                    }
-                }
-                
-                return selected;
-            }
-        }
-
-        // ============================================
-        // UI CONTROLLER
-        // ============================================
-
-        const engine = new NeonPrecisionEngine();
-        let currentMode = null;
-
-        const rouletteChips = [
-            { value: 5, color: '#DC143C', label: '5' },
-            { value: 25, color: '#228B22', label: '25' },
-            { value: 100, color: '#000080', label: '100' },
-            { value: 500, color: '#800080', label: '500' },
-            { value: 1000, color: '#FFD700', label: '1K' },
-            { value: 5000, color: '#FF8C00', label: '5K' },
-            { value: 25000, color: '#8B4513', label: '25K' },
-            { value: 100000, color: '#4169E1', label: '100K' }
+        // Fichas Baccarat (imagen 1)
+        const CHIPS_BACCARAT = [
+            { value: 1000, label: '1K', class: 'chip-1k' },
+            { value: 2500, label: '2.5K', class: 'chip-2.5k' },
+            { value: 5000, label: '5K', class: 'chip-5k' },
+            { value: 25000, label: '25K', class: 'chip-25k' },
+            { value: 100000, label: '100K', class: 'chip-100k' },
+            { value: 500000, label: '500K', class: 'chip-500k' },
+            { value: 1200000, label: '1.2M', class: 'chip-1.2m' },
+            { value: 5000000, label: '5M', class: 'chip-5m' }
         ];
 
-        const baccaratChips = [
-            { value: 500, color: '#4B0082', label: '500' },
-            { value: 2500, color: '#808080', label: '2.5K' },
-            { value: 5000, color: '#DAA520', label: '5K' },
-            { value: 25000, color: '#DC143C', label: '25K' },
-            { value: 100000, color: '#006B7D', label: '100K' },
-            { value: 500000, color: '#2F4F4F', label: '500K' },
-            { value: 1000000, color: '#8B008B', label: '1M' },
-            { value: 5000000, color: '#1E90FF', label: '5M' }
+        // Fichas Ruleta (imagen 2)
+        const CHIPS_ROULETTE = [
+            { value: 500, label: '500', class: 'chip-500' },
+            { value: 2500, label: '2.5K', class: 'chip-2500-r' },
+            { value: 5000, label: '5K', class: 'chip-5000' },
+            { value: 25000, label: '25K', class: 'chip-25000' },
+            { value: 100000, label: '100K', class: 'chip-100000' },
+            { value: 500000, label: '500K', class: 'chip-500000' },
+            { value: 1200000, label: '1.2M', class: 'chip-1200000' },
+            { value: 5000000, label: '5M', class: 'chip-5000000' }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            
-            if (engine.mode) {
-                showGamePanel();
-                selectMode(engine.mode);
-            }
-            
-            setupEventListeners();
-            generateRouletteNumbers();
-        });
-
-        function setupEventListeners() {
-            document.getElementById('modeRoulette').addEventListener('click', () => {
-                currentMode = 'roulette';
-                document.getElementById('modeRoulette').classList.add('bg-cyan-400', 'text-black');
-                document.getElementById('modeBaccarat').classList.remove('bg-emerald-400', 'text-black');
-            });
-
-            document.getElementById('modeBaccarat').addEventListener('click', () => {
-                currentMode = 'baccarat';
-                document.getElementById('modeBaccarat').classList.add('bg-emerald-400', 'text-black');
-                document.getElementById('modeRoulette').classList.remove('bg-cyan-400', 'text-black');
-            });
-
-            document.getElementById('startBtn').addEventListener('click', startSession);
-            document.getElementById('undoBtn').addEventListener('click', undoLast);
-            document.getElementById('resetShoeBtn').addEventListener('click', resetShoe);
-            document.getElementById('endSessionBtn').addEventListener('click', endSession);
-
-            document.querySelectorAll('#baccaratInput .number-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const result = e.target.dataset.result || e.target.parentElement.dataset.result;
-                    addResult(result);
-                });
-            });
-        }
-
-        function generateRouletteNumbers() {
-            const container = document.querySelector('#rouletteInput .grid');
-            const rouletteLayout = [
-                { num: 0, color: 'bg-green-600' },
-                ...Array.from({length: 36}, (_, i) => ({
-                    num: i + 1,
-                    color: [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(i + 1) ? 'bg-red-600' : 'bg-gray-800'
-                }))
-            ];
-
-            rouletteLayout.forEach(({num, color}) => {
-                const btn = document.createElement('button');
-                btn.className = `number-btn ${color} text-white p-4 rounded-lg font-bold text-lg neon-border border-2`;
-                btn.textContent = num;
-                btn.addEventListener('click', () => addResult(num));
-                container.appendChild(btn);
-            });
-        }
-
-        function startSession() {
-            if (!currentMode) {
-                alert('Selecciona un modo primero (Ruleta o Baccarat)');
-                return;
-            }
-
-            const capital = parseFloat(document.getElementById('capitalInput').value);
-            const meta = parseFloat(document.getElementById('metaInput').value);
-            const stopLoss = parseFloat(document.getElementById('stopLossInput').value);
-
-            if (!capital || !meta || !stopLoss) {
-                alert('Completa todos los campos de configuración');
-                return;
-            }
-
-            engine.setMode(currentMode);
-            engine.setCapital(capital, meta, stopLoss);
-            
-            showGamePanel();
-            selectMode(currentMode);
-        }
-
-        function showGamePanel() {
-            document.getElementById('configPanel').classList.add('hidden');
-            document.getElementById('gamePanel').classList.remove('hidden');
-            updateDashboard();
-        }
-
-        function selectMode(mode) {
-            if (mode === 'roulette') {
-                document.getElementById('rouletteInput').classList.remove('hidden');
-                document.getElementById('baccaratInput').classList.add('hidden');
-            } else {
-                document.getElementById('rouletteInput').classList.add('hidden');
-                document.getElementById('baccaratInput').classList.remove('hidden');
-            }
-        }
-
-        function addResult(result) {
-            engine.addResult(result);
+        // ============ INICIALIZACIÓN ============
+        function init() {
+            loadFromLocalStorage();
             updateUI();
         }
 
-        function undoLast() {
-            engine.undoLast();
+        // ============ LOCALSTORAGE ============
+        function saveToLocalStorage() {
+            localStorage.setItem('neonPrecisionV18', JSON.stringify(state));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('neonPrecisionV18');
+            if (saved) {
+                try {
+                    state = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error loading state:', e);
+                }
+            }
+        }
+
+        // ============ MATEMÁTICA - RULETA ============
+        function analyzeRoulette(history) {
+            if (history.length < 10) {
+                return { dozen: null, confidence: 0, reason: 'Datos insuficientes' };
+            }
+
+            // Contar frecuencias por docena
+            const dozenFreq = { 1: 0, 2: 0, 3: 0, 0: 0 };
+            history.forEach(num => {
+                const dozen = getDozen(num);
+                dozenFreq[dozen]++;
+            });
+
+            // Ley del tercio: buscar docena más fría
+            const dozens = [1, 2, 3];
+            const coldestDozen = dozens.reduce((a, b) => 
+                dozenFreq[a] < dozenFreq[b] ? a : b
+            );
+
+            // Calcular déficit
+            const avgFreq = dozens.reduce((sum, d) => sum + dozenFreq[d], 0) / 3;
+            const deficit = avgFreq - dozenFreq[coldestDozen];
+
+            // Calcular confianza (65% base + déficit)
+            let confidence = 65 + (deficit * 3);
+            confidence = Math.min(confidence, 95);
+
+            // Análisis de zonas calientes
+            const recentNumbers = history.slice(-12);
+            const recentDozens = recentNumbers.map(getDozen).filter(d => d !== 0);
+            const recentFreq = { 1: 0, 2: 0, 3: 0 };
+            recentDozens.forEach(d => recentFreq[d]++);
+
+            // Si una docena está muy caliente recientemente, reducir confianza
+            const maxRecent = Math.max(...Object.values(recentFreq));
+            if (maxRecent > 6) {
+                confidence *= 0.9;
+            }
+
+            return {
+                dozen: coldestDozen,
+                confidence: Math.round(confidence),
+                reason: `Déficit: ${deficit.toFixed(1)} apariciones`,
+                frequencies: dozenFreq
+            };
+        }
+
+        function getDozen(num) {
+            if (num === 0) return 0;
+            if (num <= 12) return 1;
+            if (num <= 24) return 2;
+            return 3;
+        }
+
+        // ============ MATEMÁTICA - BACCARAT ============
+        function analyzeBaccarat(history) {
+            if (history.length < 10) {
+                return { side: null, confidence: 0, reason: 'Datos insuficientes' };
+            }
+
+            const sides = history.map(h => h.side);
+            
+            // Contar frecuencias
+            const pCount = sides.filter(s => s === 'P').length;
+            const bCount = sides.filter(s => s === 'B').length;
+            const tCount = sides.filter(s => s === 'T').length;
+
+            // Detectar racha actual
+            let streakSide = sides[sides.length - 1];
+            let streakCount = 1;
+            for (let i = sides.length - 2; i >= 0; i--) {
+                if (sides[i] === streakSide && sides[i] !== 'T') {
+                    streakCount++;
+                } else if (sides[i] !== 'T') {
+                    break;
+                }
+            }
+
+            // Detectar patrón ZigZag
+            let zigzagCount = 0;
+            for (let i = sides.length - 1; i > 0; i--) {
+                if (sides[i] !== 'T' && sides[i-1] !== 'T' && sides[i] !== sides[i-1]) {
+                    zigzagCount++;
+                } else if (sides[i] !== 'T') {
+                    break;
+                }
+            }
+
+            let prediction = null;
+            let confidence = 50;
+            let reason = '';
+
+            // Lógica de predicción
+            if (streakCount >= 6) {
+                // Racha larga: apostar CONTRA
+                prediction = streakSide === 'P' ? 'B' : 'P';
+                confidence = 60 + Math.min(streakCount - 6, 10) * 2;
+                reason = `Ruptura de racha ${streakSide} x${streakCount}`;
+            } else if (zigzagCount >= 4) {
+                // Patrón ZigZag: continuar alternancia
+                prediction = streakSide === 'P' ? 'B' : 'P';
+                confidence = 68;
+                reason = `Patrón ZigZag detectado`;
+            } else {
+                // Ventaja matemática: Banker ligeramente mejor
+                prediction = 'B';
+                confidence = 52;
+                reason = 'Ventaja estadística Banker';
+            }
+
+            return {
+                side: prediction,
+                confidence: Math.round(confidence),
+                reason,
+                streak: { side: streakSide, count: streakCount },
+                frequencies: { P: pCount, B: bCount, T: tCount }
+            };
+        }
+
+        // ============ GESTIÓN DE CAPITAL ============
+        function calculateBetRoulette() {
+            const session = state.roulette;
+            const baseUnit = session.capital * 0.01;
+            const amount = baseUnit * session.dalembertLevel;
+            return Math.round(amount);
+        }
+
+        function calculateBetBaccarat() {
+            const session = state.baccarat;
+            const baseUnit = session.capital * 0.01;
+            const multiplier = SEQUENCE_1324[session.sequencePosition];
+            const amount = baseUnit * multiplier;
+            return Math.round(amount);
+        }
+
+        // ============ REGISTRO DE RESULTADOS ============
+        function registerRouletteNumber(num) {
+            const session = state.roulette;
+            session.history.push(num);
+
+            // Mantener ventana deslizante de 37
+            if (session.history.length > 37) {
+                session.history.shift();
+            }
+
+            // FASE 1: COLLECTING
+            if (session.phase === 'collecting') {
+                session.collectionCount++;
+                if (session.collectionCount >= 37) {
+                    session.phase = 'ghosting';
+                    session.ghostCount = 0;
+                }
+            }
+            // FASE 2: GHOSTING
+            else if (session.phase === 'ghosting') {
+                const analysis = analyzeRoulette(session.history);
+                session.prediction = analysis.dozen;
+                session.confidence = analysis.confidence;
+
+                // Verificar acierto en ghost
+                const actualDozen = getDozen(num);
+                if (actualDozen === session.prediction && actualDozen !== 0) {
+                    session.ghostCount += 1.5;
+                } else {
+                    session.ghostCount += 1;
+                }
+
+                if (session.ghostCount >= 10) {
+                    // Verificar si la confianza es suficiente
+                    if (session.confidence >= 75) {
+                        session.phase = 'active';
+                    } else {
+                        // Seguir en ghosting hasta alcanzar confianza
+                        session.ghostCount = 8; // No salir aún
+                    }
+                }
+            }
+            // FASE 4: RECALIBRATING
+            else if (session.phase === 'recalibrating') {
+                const analysis = analyzeRoulette(session.history);
+                session.prediction = analysis.dozen;
+                session.confidence = analysis.confidence;
+
+                const actualDozen = getDozen(num);
+                if (actualDozen === session.prediction && actualDozen !== 0) {
+                    session.recalibrationCount += 1.5;
+                } else {
+                    session.recalibrationCount += 1;
+                }
+
+                if (session.recalibrationCount >= 5) {
+                    if (session.confidence >= 75) {
+                        session.phase = 'active';
+                        session.consecutiveLosses = 0;
+                    } else {
+                        session.recalibrationCount = 3;
+                    }
+                }
+            }
+            // FASE 3: ACTIVE
+            else if (session.phase === 'active') {
+                const analysis = analyzeRoulette(session.history);
+                session.prediction = analysis.dozen;
+                session.confidence = analysis.confidence;
+
+                // Si había una apuesta activa
+                if (session.selectedChips.length > 0) {
+                    const betAmount = session.selectedChips.reduce((sum, c) => sum + c, 0);
+                    const actualDozen = getDozen(num);
+
+                    if (actualDozen === session.prediction && actualDozen !== 0) {
+                        // VICTORIA (pago 2:1)
+                        session.capital += betAmount * 2;
+                        session.dalembertLevel = Math.max(1, session.dalembertLevel - 1);
+                        session.consecutiveLosses = 0;
+                        session.wins++;
+                    } else {
+                        // DERROTA
+                        session.capital -= betAmount;
+                        session.dalembertLevel++;
+                        session.consecutiveLosses++;
+                        session.losses++;
+
+                        // Protección: 3 pérdidas consecutivas
+                        if (session.consecutiveLosses >= 3) {
+                            session.phase = 'recalibrating';
+                            session.recalibrationCount = 0;
+                        }
+                    }
+
+                    session.selectedChips = [];
+                }
+            }
+
+            saveToLocalStorage();
             updateUI();
         }
 
-        function resetShoe() {
-            if (confirm('¿Cambiar crupier/shoe? Esto reiniciará el historial pero mantendrá el capital.')) {
-                engine.resetShoe();
-                updateUI();
-            }
-        }
+        function registerBaccaratSide(side) {
+            const session = state.baccarat;
+            session.history.push({ side, timestamp: Date.now() });
 
-        function endSession() {
-            if (confirm('¿Finalizar sesión? Se borrarán todos los datos.')) {
-                engine.clearState();
-                location.reload();
-            }
-        }
-
-        function updateUI() {
-            updateDashboard();
-            updateHistory();
-            updatePrediction();
-        }
-
-        function updateDashboard() {
-            document.getElementById('currentCapital').textContent = `${engine.capital.toLocaleString()}`;
-            
-            const profit = engine.capital - engine.initialCapital;
-            const profitEl = document.getElementById('profitDisplay');
-            profitEl.textContent = `${profit.toLocaleString()}`;
-            profitEl.className = profit >= 0 ? 'text-emerald-400 text-2xl font-bold' : 'text-red-400 text-2xl font-bold';
-            
-            document.getElementById('phaseDisplay').textContent = engine.phase;
-            
-            const totalData = engine.history.length + engine.ghostHistory.length;
-            document.getElementById('dataCount').textContent = totalData;
-        }
-
-        function updateHistory() {
-            const container = document.getElementById('historyDisplay');
-            const allData = [...engine.history, ...engine.ghostHistory];
-            
-            container.innerHTML = allData.slice(-20).map((result, idx) => {
-                if (engine.mode === 'roulette') {
-                    const color = result === 0 ? '#22c55e' : 
-                                 [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(result) ? '#dc2626' : '#1f2937';
-                    return `<div class="result-chip slide-in" style="background: ${color}; border: 2px solid #fff;">${result}</div>`;
-                } else {
-                    const colors = { P: '#3b82f6', B: '#dc2626', T: '#22c55e' };
-                    const labels = { P: 'P', B: 'B', T: 'T' };
-                    return `<div class="result-chip slide-in" style="background: ${colors[result]}; border: 2px solid #fff;">${labels[result]}</div>`;
+            // FASE 1: COLLECTING
+            if (session.phase === 'collecting') {
+                session.collectionCount++;
+                if (session.collectionCount >= 15) {
+                    session.phase = 'ghosting';
+                    session.ghostCount = 0;
                 }
-            }).join('');
+            }
+            // FASE 2: GHOSTING
+            else if (session.phase === 'ghosting') {
+                const analysis = analyzeBaccarat(session.history);
+                session.prediction = analysis.side;
+                session.confidence = analysis.confidence;
+
+                if (side === session.prediction) {
+                    session.ghostCount += 1.5;
+                } else {
+                    session.ghostCount += 1;
+                }
+
+                if (session.ghostCount >= 10) {
+                    if (session.confidence >= 75) {
+                        session.phase = 'active';
+                    } else {
+                        session.ghostCount = 8;
+                    }
+                }
+            }
+            // FASE 4: RECALIBRATING
+            else if (session.phase === 'recalibrating') {
+                const analysis = analyzeBaccarat(session.history);
+                session.prediction = analysis.side;
+                session.confidence = analysis.confidence;
+
+                if (side === session.prediction) {
+                    session.recalibrationCount += 1.5;
+                } else {
+                    session.recalibrationCount += 1;
+                }
+
+                if (session.recalibrationCount >= 5) {
+                    if (session.confidence >= 75) {
+                        session.phase = 'active';
+                        session.consecutiveLosses = 0;
+                    } else {
+                        session.recalibrationCount = 3;
+                    }
+                }
+            }
+            // FASE 3: ACTIVE
+            else if (session.phase === 'active') {
+                const analysis = analyzeBaccarat(session.history);
+                session.prediction = analysis.side;
+                session.confidence = analysis.confidence;
+
+                if (session.selectedChips.length > 0) {
+                    const betAmount = session.selectedChips.reduce((sum, c) => sum + c, 0);
+
+                    if (side === 'T') {
+                        // EMPATE en modo real: PIERDE
+                        session.capital -= betAmount;
+                        session.consecutiveLosses++;
+                        session.losses++;
+                        session.sequencePosition = 0;
+                    } else if (side === session.prediction) {
+                        // VICTORIA
+                        const multiplier = side === 'P' ? 1.1 : 0.9;
+                        session.capital += betAmount * multiplier;
+                        session.sequencePosition = (session.sequencePosition + 1) % 4;
+                        session.consecutiveLosses = 0;
+                        session.wins++;
+                    } else {
+                        // DERROTA
+                        session.capital -= betAmount;
+                        session.sequencePosition = 0;
+                        session.consecutiveLosses++;
+                        session.losses++;
+                    }
+
+                    if (session.consecutiveLosses >= 3) {
+                        session.phase = 'recalibrating';
+                        session.recalibrationCount = 0;
+                    }
+
+                    session.selectedChips = [];
+                }
+            }
+
+            saveToLocalStorage();
+            updateUI();
         }
 
-        function updatePrediction() {
-            const prediction = engine.getPrediction();
-            const panel = document.getElementById('predictionPanel');
+        // ============ UI - SELECTOR DE FICHAS ============
+        function toggleChip(value) {
+            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            const idx = session.selectedChips.indexOf(value);
             
-            if (engine.phase === 'RECOLECCIÓN') {
-                panel.classList.add('hidden');
-                return;
-            }
-            
-            panel.classList.remove('hidden');
-            
-            document.getElementById('predictionValue').textContent = prediction.value || '---';
-            document.getElementById('confidenceValue').textContent = `${prediction.confidence}%`;
-            
-            if (engine.phase === 'FUEGO_REAL' && prediction.confidence >= 75) {
-                const betAmount = engine.calculateBetAmount();
-                document.getElementById('betValue').textContent = `${betAmount.toLocaleString()}`;
-                
-                showChipSelector(betAmount);
+            if (idx > -1) {
+                session.selectedChips.splice(idx, 1);
             } else {
-                document.getElementById('betValue').textContent = 'ESPERAR';
-                document.getElementById('chipSelectorPanel').classList.add('hidden');
+                session.selectedChips.push(value);
             }
+
+            updateUI();
         }
 
-        function showChipSelector(betAmount) {
-            const panel = document.getElementById('chipSelectorPanel');
-            const container = document.getElementById('chipSelector');
-            const chips = engine.mode === 'roulette' ? rouletteChips : baccaratChips;
+        function renderChips() {
+            const chips = currentGame === 'roulette' ? CHIPS_ROULETTE : CHIPS_BACCARAT;
+            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            const total = session.selectedChips.reduce((sum, c) => sum + c, 0);
+
+            let html = '<h3 class="text-lg font-bold mb-3 text-cyan-400">💰 SELECCIÓN DE FICHAS</h3>';
+            html += `<div class="text-center mb-3"><span class="text-2xl font-bold text-yellow-400">${formatMoney(total)}</span></div>`;
+            html += '<div class="flex flex-wrap gap-3 justify-center">';
             
-            panel.classList.remove('hidden');
-            
-            const recommended = engine.getChipRecommendation(betAmount);
-            
-            container.innerHTML = chips.map(chip => {
-                const count = recommended.filter(c => c === chip.value).length;
-                const isRecommended = count > 0;
-                
-                return `
-                    <div class="text-center">
-                        <div class="chip-img ${isRecommended ? 'selected' : ''}" 
-                             data-value="${chip.value}"
-                             style="width: 50px; height: 50px; border-radius: 50%; background: ${chip.color}; 
-                                    display: flex; align-items: center; justify-content: center; 
-                                    color: white; font-weight: bold; font-size: 0.8rem;
-                                    box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                            ${chip.label}
-                        </div>
-                        ${isRecommended ? `<p class="text-xs text-cyan-400 mt-1">x${count}</p>` : ''}
+            chips.forEach(chip => {
+                const isSelected = session.selectedChips.includes(chip.value);
+                html += `
+                    <div class="chip ${chip.class} ${isSelected ? 'selected' : ''}" onclick="toggleChip(${chip.value})">
+                        ${chip.label}
                     </div>
                 `;
-            }).join('');
-            
-            const total = recommended.reduce((sum, val) => sum + val, 0);
-            document.getElementById('totalSelected').textContent = `${total.toLocaleString()}`;
-            
-            container.querySelectorAll('.chip-img').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    chip.classList.toggle('selected');
-                    updateSelectedTotal();
-                });
             });
+
+            html += '</div>';
+
+            if (session.selectedChips.length > 0) {
+                html += `<button onclick="clearChips()" class="mt-3 w-full bg-red-600 py-2 rounded-lg font-bold">LIMPIAR FICHAS</button>`;
+            }
+
+            document.getElementById('chipsPanel').innerHTML = html;
         }
 
-        function updateSelectedTotal() {
-            const selected = document.querySelectorAll('.chip-img.selected');
-            let total = 0;
-            selected.forEach(chip => {
-                total += parseInt(chip.dataset.value);
-            });
-            document.getElementById('totalSelected').textContent = `${total.toLocaleString()}`;
+        function clearChips() {
+            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            session.selectedChips = [];
+            updateUI();
         }
 
-        if (engine.mode) {
-            setTimeout(() => {
-                showGamePanel();
-                selectMode(engine.mode);
-                updateUI();
-            }, 100);
+        // ============ UI - PREDICCIÓN ============
+        function renderPrediction() {
+            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            let html = '';
+
+            if (session.phase === 'collecting') {
+                const target = currentGame === 'roulette' ? 37 : 15;
+                const progress = (session.collectionCount / target) * 100;
+                html = `
+                    <div class="text-center">
+                        <div class="text-xl font-bold text-purple-400 mb-2">📊 FASE 1: RECOLECCIÓN</div>
+                        <div class="text-4xl font-bold mb-2">${session.collectionCount}/${target}</div>
+                        <div class="w-full bg-gray-700 rounded-full h-4 mb-2">
+                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-4 rounded-full transition-all" style="width: ${progress}%"></div>
+                        </div>
+                        <p class="text-sm text-gray-400">Ingresa datos iniciales para calibrar el sistema</p>
+                    </div>
+                `;
+            } else if (session.phase === 'ghosting') {
+                const progress = (session.ghostCount / 10) * 100;
+                html = `
+                    <div class="text-center">
+                        <div class="text-xl font-bold text-blue-400 mb-2">👻 FASE 2: MODO FANTASMA</div>
+                        <div class="text-4xl font-bold mb-2">${Math.floor(session.ghostCount)}/10</div>
+                        <div class="w-full bg-gray-700 rounded-full h-4 mb-2">
+                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 h-4 rounded-full transition-all" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="mt-3 p-3 bg-blue-900/30 rounded-lg">
+                            <div class="text-sm text-gray-300">Predicción: <span class="font-bold text-white">${session.prediction || 'N/A'}</span></div>
+                            <div class="text-sm text-gray-300">Confianza: <span class="font-bold ${session.confidence >= 75 ? 'text-green-400' : 'text-yellow-400'}">${session.confidence}%</span></div>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-2">Validando precisión matemática...</p>
+                    </div>
+                `;
+            } else if (session.phase === 'recalibrating') {
+                const progress = (session.recalibrationCount / 5) * 100;
+                html = `
+                    <div class="text-center">
+                        <div class="text-xl font-bold text-amber-400 mb-2">⚠️ FASE 4: RECALIBRACIÓN</div>
+                        <div class="text-4xl font-bold mb-2">${Math.floor(session.recalibrationCount)}/5</div>
+                        <div class="w-full bg-gray-700 rounded-full h-4 mb-2">
+                            <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-4 rounded-full transition-all" style="width: ${progress}%"></div>
+                        </div>
+                        <p class="text-sm text-red-400 mt-2">Sistema en protección tras 3 pérdidas consecutivas</p>
+                    </div>
+                `;
+            } else if (session.phase === 'active') {
+                const suggestedBet = currentGame === 'roulette' ? calculateBetRoulette() : calculateBetBaccarat();
+                
+                if (session.confidence >= 75) {
+                    html = `
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-green-400 mb-2 pulse-animation">🔥 FASE 3: FUEGO REAL</div>
+                            <div class="grid grid-cols-3 gap-3 mb-3">
+                                <div class="bg-green-900/30 p-3 rounded-lg">
+                                    <div class="text-xs text-gray-400">PREDICCIÓN</div>
+                                    <div class="text-2xl font-bold">${session.prediction || 'N/A'}</div>
+                                </div>
+                                <div class="bg-green-900/30 p-3 rounded-lg">
+                                    <div class="text-xs text-gray-400">CONFIANZA</div>
+                                    <div class="text-2xl font-bold text-green-400">${session.confidence}%</div>
+                                </div>
+                                <div class="bg-green-900/30 p-3 rounded-lg">
+                                    <div class="text-xs text-gray-400">SUGERENCIA</div>
+                                    <div class="text-2xl font-bold text-yellow-400">${formatMoney(suggestedBet)}</div>
+                                </div>
+                            </div>
+                            <div class="bg-green-600/20 border border-green-500 rounded-lg p-3">
+                                <div class="font-bold">✅ AUTORIZADO PARA APOSTAR</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html = `
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-yellow-400 mb-2">⏳ ACTIVO - ESPERANDO</div>
+                            <div class="text-lg mb-2">Confianza actual: <span class="font-bold">${session.confidence}%</span></div>
+                            <div class="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3">
+                                <div class="font-bold">⚠️ ESPERAR - Confianza insuficiente (&lt; 75%)</div>
+                                <p class="text-sm mt-2">Continúa ingresando resultados para mejorar la precisión</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById('predictionPanel').innerHTML = html;
         }
+
+        // ============ UI - ESTADO ============
+        function renderStatus() {
+            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            const profit = session.capital - session.initialCapital;
+            const profitPercent = ((profit / session.initialCapital) * 100).toFixed(1);
+            const winRate = session.wins + session.losses > 0 ? ((session.wins / (session.wins + session.losses)) * 100).toFixed(0) : 0;
+
+            let phaseColor = '';
+            if (session.phase === 'collecting') phaseColor = 'text-purple-400';
+            else if (session.phase === 'ghosting') phaseColor = 'text-blue-400';
+            else if (session.phase === 'recalibrating') phaseColor = 'text-amber-400';
+            else phaseColor = 'text-green-400';
+
+            const html = `
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400">CAPITAL</div>
+                        <div class="text-2xl font-bold ${profit >= 0 ? 'text-green-400' : 'text-red-400'}">${formatMoney(session.capital)}</div>
+                        <div class="text-xs ${profit >= 0 ? 'text-green-400' : 'text-red-400'}">${profit >= 0 ? '+' : ''}${formatMoney(profit)} (${profitPercent}%)</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400">META</div>
+                        <div class="text-xl font-bold text-cyan-400">${formatMoney(session.target)}</div>
+                        <div class="text-xs text-gray-400">Stop: ${formatMoney(session.stopLoss)}</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400">FASE</div>
+                        <div class="text-xl font-bold ${phaseColor}">${session.phase.toUpperCase()}</div>
+                        <div class="text-xs text-gray-400">Nivel: ${currentGame === 'roulette' ? session.dalembertLevel : session.sequencePosition + 1}/4</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400">WIN RATE</div>
+                        <div class="text-xl font-bold text-purple-400">${winRate}%</div>
+                        <div class="text-xs text-gray-400">${session.wins}W / ${session.losses}L</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('statusPanel').innerHTML = html;
+        }
+
+        // ============ UI - INTERFAZ DE JUEGO ============
+        function renderGameInterface() {
+            if (currentGame === 'roulette') {
+                renderRouletteGrid();
+            } else {
+                renderBaccaratButtons();
+            }
+        }
+
+        function renderRouletteGrid() {
+            let html = '<h3 class="text-lg font-bold mb-3 text-center text-cyan-400">🎯 RULETA EUROPEA</h3>';
+            
+            // Número 0
+            html += '<div class="flex justify-center mb-3">';
+            html += '<button class="number-btn number-green" onclick="registerRouletteNumber(0)">0</button>';
+            html += '</div>';
+
+            // Números 1-36
+            html += '<div class="grid grid-cols-6 gap-2">';
+            for (let i = 1; i <= 36; i++) {
+                const colorClass = REDS.includes(i) ? 'number-red' : 'number-black';
+                html += `<button class="number-btn ${colorClass}" onclick="registerRouletteNumber(${i})">${i}</button>`;
+            }
+            html += '</div>';
+
+            document.getElementById('gameInterface').innerHTML = html;
+        }
+
+        function renderBaccaratButtons() {
+            const html = `
+                <h3 class="text-lg font-bold mb-3 text-center text-blue-400">🃏 BACCARAT</h3>
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="registerBaccaratSide('P')" class="bg-gradient-to-br from-blue-600 to-blue-700 py-12 rounded-xl font-bold text-2xl border-2 border-blue-400 hover:scale-105 transition-transform">
+                        🔵<br>PLAYER
+                    </button>
+                    <button onclick="registerBaccaratSide('B')" class="bg-gradient-to-br from-red-600 to-red-700 py-12 rounded-xl font-bold text-2xl border-2 border-red-400 hover:scale-105 transition-transform">
+                        🔴<br>BANKER
+                    </button>
+                    <button onclick="registerBaccaratSide('T')" class="bg-gradient-to-br from-green-600 to-green-700 py-12 rounded-xl font-bold text-2xl border-2 border-green-400 hover:scale-105 transition-transform">
+                        🟢<br>TIE
+                    </button>
+                </div>
+                <div class="mt-3 text-center text-xs text-gray-400">
+                    <p>Player paga 1.1x • Banker paga 0.9x • Tie pierde en modo real</p>
+                </div>
+            `;
+
+            document.getElementById('gameInterface').innerHTML = html;
+        }
+
+        // ============ UI - ACTUALIZACIÓN GENERAL ============
+        function updateUI() {
+            renderStatus();
+            renderPrediction();
+            renderChips();
+            renderGameInterface();
+            updateGameButtons();
+        }
+
+        function updateGameButtons() {
+            document.getElementById('btnRoulette').className = currentGame === 'roulette' 
+                ? 'flex-1 py-4 rounded-xl font-bold text-lg glass neon-crimson'
+                : 'flex-1 py-4 rounded-xl font-bold text-lg glass';
+
+            document.getElementById('btnBaccarat').className = currentGame === 'baccarat'
+                ? 'flex-1 py-4 rounded-xl font-bold text-lg glass neon-cyan'
+                : 'flex-1 py-4 rounded-xl font-bold text-lg glass';
+        }
+
+        // ============ CONTROLES ============
+        function switchGame(game) {
+            currentGame = game;
+            updateUI();
+        }
+
+        function toggleConfig() {
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden');
+            
+            if (!panel.classList.contains('hidden')) {
+                const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+                document.getElementById('inputCapital').value = session.capital;
+                document.getElementById('inputTarget').value = session.target;
+                document.getElementById('inputStopLoss').value = session.stopLoss;
+            }
+        }
+
+        function applyConfig() {
+            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            
+            session.capital = parseInt(document.getElementById('inputCapital').value) || session.capital;
+            session.initialCapital = session.capital;
+            session.target = parseInt(document.getElementById('inputTarget').value) || session.target;
+            session.stopLoss = parseInt(document.getElementById('inputStopLoss').value) || session.stopLoss;
+
+            saveToLocalStorage();
+            toggleConfig();
+            updateUI();
+
+            alert('✅ Configuración aplicada correctamente');
+        }
+
+        function changeCroupier() {
+            if (!confirm('¿Cambiar crupier/shoe? Esto reiniciará el historial y fase actual.')) return;
+
+            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            
+            session.history = [];
+            session.phase = 'recalibrating';
+            session.collectionCount = 0;
+            session.ghostCount = 0;
+            session.recalibrationCount = 0;
+            session.consecutiveLosses = 0;
+            session.selectedChips = [];
+
+            saveToLocalStorage();
+            updateUI();
+
+            alert('🔄 Crupier cambiado. Sistema en recalibración.');
+        }
+
+        function resetSession() {
+            if (!confirm('⚠️ ¿FINALIZAR SESIÓN? Esto borrará TODOS los datos incluyendo el saldo.')) return;
+            if (!confirm('¿Estás SEGURO? Esta acción no se puede deshacer.')) return;
+
+            localStorage.removeItem('neonPrecisionV18');
+            location.reload();
+        }
+
+        function exportData() {
+            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            const data = {
+                game: currentGame,
+                timestamp: new Date().toISOString(),
+                capital: session.capital,
+                profit: session.capital - session.initialCapital,
+                wins: session.wins,
+                losses: session.losses,
+                phase: session.phase,
+                history: session.history
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `neon-precision-${currentGame}-${Date.now()}.json`;
+            a.click();
+
+            alert('📊 Datos exportados correctamente');
+        }
+
+        function formatMoney(amount) {
+            if (amount >= 1000000) {
+                return `${(amount / 1000000).toFixed(1)}M`;
+            } else if (amount >= 1000) {
+                return `${(amount / 1000).toFixed(0)}K`;
+            }
+            return `${amount.toFixed(0)}`;
+        }
+
+        // ============ INICIAR APLICACIÓN ============
+        window.onload = init;
     </script>
 </body>
 </html>
