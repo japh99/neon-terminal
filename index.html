@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON PRECISION V5</title>
+    <title>NEON PRECISION V6 - AI AUTO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -14,7 +15,8 @@
                         neon: { cyan: '#00e5ff', emerald: '#00ffa3', crimson: '#ff0055', amber: '#ffb800' },
                         bg: { dark: '#050505', card: 'rgba(255,255,255,0.05)' }
                     },
-                    fontFamily: { mono: ['Courier New', 'monospace'] }
+                    fontFamily: { mono: ['Courier New', 'monospace'] },
+                    animation: { 'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
                 }
             }
         }
@@ -29,27 +31,26 @@
         .green-num { background: rgba(5, 150, 105, 0.3); border: 1px solid rgba(5, 150, 105, 0.5); color: #6ee7b7; }
         .toast { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 10px; z-index: 100; animation: slideIn 0.3s; display: none; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        
-        /* Estilos específicos para iPad/Móvil */
-        input, button { font-size: 16px; } 
+        .loader { border: 3px solid rgba(255,255,255,0.1); border-left-color: #00e5ff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen p-4 font-sans selection:bg-neon-cyan/30">
 
-    <div class="max-w-5xl mx-auto space-y-6 pb-20">
+    <div class="max-w-5xl mx-auto space-y-6 pb-24">
         
         <!-- HEADER -->
         <header class="glass rounded-2xl p-6 relative overflow-hidden">
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-3">
-                    <i data-lucide="activity" class="text-neon-cyan w-8 h-8"></i>
+                    <i data-lucide="cpu" class="text-neon-cyan w-8 h-8"></i>
                     <div>
-                        <h1 class="text-2xl font-bold tracking-widest">NEON <span class="text-neon-cyan">V5</span></h1>
+                        <h1 class="text-2xl font-bold tracking-widest">NEON <span class="text-neon-cyan">AUTO</span></h1>
                         <p class="text-xs text-gray-500 uppercase tracking-[0.2em]" id="game-mode-label">SISTEMA RULETA</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="resetDealer()" class="p-3 bg-neon-amber/20 text-neon-amber rounded-xl hover:bg-neon-amber/40" title="Cambio Crupier"><i data-lucide="rotate-ccw"></i></button>
+                    <button onclick="resetDealer()" class="p-3 bg-neon-amber/20 text-neon-amber rounded-xl hover:bg-neon-amber/40 border border-neon-amber/30" title="Cambio Crupier"><i data-lucide="rotate-ccw"></i></button>
                     <button onclick="toggleSettings()" class="p-3 bg-white/10 rounded-xl hover:bg-white/20"><i data-lucide="settings"></i></button>
                 </div>
             </div>
@@ -88,22 +89,17 @@
 
         <!-- SETTINGS MODAL -->
         <div id="settings-panel" class="glass p-6 rounded-2xl hidden mb-6 border-l-4 border-neon-amber">
-            <h3 class="text-neon-amber font-bold mb-4">CONFIGURACIÓN DE BANCA (INDEPENDIENTE)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label class="text-xs text-gray-400">Capital Inicial</label>
-                    <input type="number" id="input-initial" class="w-full bg-black/50 border border-white/20 rounded p-3 text-white" placeholder="Capital">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400">Meta</label>
-                    <input type="number" id="input-target" class="w-full bg-black/50 border border-white/20 rounded p-3 text-white" placeholder="Meta">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400">Stop Loss</label>
-                    <input type="number" id="input-stop" class="w-full bg-black/50 border border-white/20 rounded p-3 text-white" placeholder="Stop Loss">
-                </div>
+            <h3 class="text-neon-amber font-bold mb-4">CONFIGURACIÓN</h3>
+            <div class="mb-4">
+                <label class="text-xs text-gray-400 block mb-1">GEMINI API KEY (Obligatorio)</label>
+                <input type="password" id="input-api-key" class="w-full bg-black/50 border border-white/20 rounded p-3 text-white text-sm" placeholder="Pega tu AIza... aquí">
             </div>
-            <button onclick="saveSettings()" class="w-full bg-neon-emerald/20 text-neon-emerald border border-neon-emerald py-3 rounded-xl font-bold hover:bg-neon-emerald/40">GUARDAR CAMBIOS</button>
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <input type="number" id="input-initial" class="bg-black/50 border border-white/20 rounded p-2 text-white" placeholder="Capital">
+                <input type="number" id="input-target" class="bg-black/50 border border-white/20 rounded p-2 text-white" placeholder="Meta">
+                <input type="number" id="input-stop" class="bg-black/50 border border-white/20 rounded p-2 text-white" placeholder="Stop Loss">
+            </div>
+            <button onclick="saveSettings()" class="w-full bg-neon-emerald/20 text-neon-emerald border border-neon-emerald py-3 rounded-xl font-bold hover:bg-neon-emerald/40">GUARDAR Y CONECTAR</button>
         </div>
 
         <!-- GAME SWITCHER -->
@@ -112,42 +108,47 @@
             <button onclick="switchGame('baccarat')" id="btn-mode-baccarat" class="p-4 rounded-xl font-bold border border-white/10 bg-white/5 text-gray-500 transition-all flex items-center justify-center gap-2"><i data-lucide="spade"></i> BACCARAT</button>
         </div>
 
-        <!-- AI SECTION -->
-        <div class="glass p-6 rounded-2xl border border-white/10">
+        <!-- AI SECTION (AUTOMÁTICA) -->
+        <div class="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="cpu"></i> MOTOR IA</h3>
-                <span id="waiting-prediction" class="hidden bg-neon-amber/20 text-neon-amber px-3 py-1 rounded text-xs font-bold animate-pulse">ESPERANDO RESULTADO</span>
+                <h3 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="brain-circuit"></i> PREDICCIÓN IA</h3>
+                <span id="ai-status" class="text-xs font-mono text-gray-500">ESPERANDO DATOS...</span>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <button onclick="generatePrompt()" id="btn-gen-prompt" class="py-4 rounded-xl font-bold bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed flex justify-center gap-2 items-center" disabled>
-                    <i data-lucide="copy"></i> COPIAR PROMPT
-                </button>
-                <button onclick="window.open('https://aistudio.google.com/app/prompts/new_chat', '_blank')" class="py-4 rounded-xl font-bold bg-black border border-white/20 text-white hover:bg-white/10 flex justify-center gap-2 items-center">
-                    <i data-lucide="external-link"></i> IR A GOOGLE AI
-                </button>
+            <!-- RESULTADO IA -->
+            <div id="ai-result-container" class="hidden text-center py-4">
+                <div class="text-sm text-gray-400 mb-1">LA IA SUGIERE:</div>
+                <div id="ai-prediction-text" class="text-4xl font-black text-white mb-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">---</div>
+                <div class="flex justify-center gap-4 mb-3">
+                    <div class="bg-white/10 px-3 py-1 rounded border border-white/10">
+                        <span class="text-xs text-gray-400">PROBABILIDAD</span><br>
+                        <span id="ai-confidence" class="text-xl font-bold text-neon-cyan">0%</span>
+                    </div>
+                    <div class="bg-white/10 px-3 py-1 rounded border border-white/10">
+                        <span class="text-xs text-gray-400">APUESTA</span><br>
+                        <span id="ai-bet" class="text-xl font-bold text-neon-amber">$0</span>
+                    </div>
+                </div>
+                <p id="ai-analysis" class="text-xs text-gray-400 italic border-t border-white/10 pt-2">...</p>
+                
+                <!-- Botones de Confirmación de Predicción -->
+                <div id="prediction-confirmation" class="mt-4 p-3 bg-neon-cyan/10 border border-neon-cyan/30 rounded-xl animate-pulse-fast">
+                    <p class="text-xs font-bold text-neon-cyan mb-2">¿APOSTASTE A ESTO?</p>
+                    <div class="flex gap-2 justify-center">
+                        <span class="text-xs text-gray-300">Marca el resultado abajo para validar</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- MANUAL PREDICTION INPUT -->
-            <div class="bg-black/40 p-4 rounded-xl border border-white/10">
-                <p class="text-[10px] text-gray-500 mb-3 uppercase tracking-widest font-bold text-center">REGISTRAR PREDICCIÓN IA</p>
-                <div id="prediction-inputs-roulette" class="flex gap-2">
-                    <button onclick="setPrediction(1)" class="flex-1 py-3 bg-white/5 hover:bg-neon-cyan/20 border border-white/10 rounded-lg font-bold text-sm">DOCENA 1</button>
-                    <button onclick="setPrediction(2)" class="flex-1 py-3 bg-white/5 hover:bg-neon-cyan/20 border border-white/10 rounded-lg font-bold text-sm">DOCENA 2</button>
-                    <button onclick="setPrediction(3)" class="flex-1 py-3 bg-white/5 hover:bg-neon-cyan/20 border border-white/10 rounded-lg font-bold text-sm">DOCENA 3</button>
-                </div>
-                <div id="prediction-inputs-baccarat" class="flex gap-2 hidden">
-                    <button onclick="setPrediction('P')" class="flex-1 py-3 bg-blue-900/20 border-blue-500/30 text-blue-400 rounded-lg font-bold">PLAYER</button>
-                    <button onclick="setPrediction('B')" class="flex-1 py-3 bg-red-900/20 border-red-500/30 text-red-400 rounded-lg font-bold">BANKER</button>
-                </div>
-            </div>
+            <!-- BOTÓN CONSULTAR -->
+            <button onclick="callGeminiAuto()" id="btn-consult-ai" class="w-full py-4 rounded-xl font-bold bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed flex justify-center gap-2 items-center transition-all" disabled>
+                <span id="btn-ai-text">RECOLECTANDO DATOS...</span>
+            </button>
         </div>
 
         <!-- GAME INPUTS -->
         <div id="game-roulette" class="glass p-6 rounded-2xl">
-            <div class="grid grid-cols-6 gap-2" id="roulette-grid">
-                <!-- JS generará los botones -->
-            </div>
+            <div class="grid grid-cols-6 gap-2" id="roulette-grid"></div>
             <div class="mt-4 flex gap-1 overflow-x-auto pb-2" id="roulette-history"></div>
         </div>
 
@@ -165,37 +166,34 @@
     <!-- TOAST -->
     <div id="toast" class="toast bg-slate-800 border border-neon-cyan text-white font-bold"></div>
 
-    <!-- LOGIC SCRIPT -->
     <script>
         // --- ESTADO GLOBAL ---
         let state = {
+            apiKey: '',
             activeGame: 'roulette',
             roulette: {
                 history: [],
                 bankroll: { current: 1000, initial: 1000, target: 1500, stopLoss: 500 },
                 level: 1,
                 losses: 0,
-                prediction: null,
-                status: 'collecting', // collecting, ghosting, active, calibrating
-                ghostCount: 0,
-                calibrationCount: 0
+                activePrediction: null, // Lo que dijo la IA
+                status: 'collecting', // collecting, calibrating (5), ghosting (10), active
+                counter: 0
             },
             baccarat: {
                 history: [],
                 bankroll: { current: 1000, initial: 1000, target: 1500, stopLoss: 500 },
-                step: 0, // 1-3-2-4
+                step: 0,
                 losses: 0,
-                prediction: null,
+                activePrediction: null,
                 status: 'collecting',
-                ghostCount: 0,
-                calibrationCount: 0
+                counter: 0
             }
         };
 
         const REDS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
         const SEQ_1324 = [1, 3, 2, 4];
 
-        // --- INICIALIZACIÓN ---
         function init() {
             loadState();
             renderRouletteGrid();
@@ -209,33 +207,31 @@
             s.history.push(num);
             if (s.history.length > 37) s.history.shift();
 
-            // Máquina de Estados
-            if (s.status === 'collecting' && s.history.length >= 37) {
-                s.status = 'ghosting'; s.ghostCount = 0;
-            } else if (s.status === 'ghosting') {
-                s.ghostCount++;
-                if (s.ghostCount >= 10) { s.status = 'active'; s.ghostCount = 0; }
-            } else if (s.status === 'calibrating') {
-                s.calibrationCount++;
-                if (s.calibrationCount >= 5) { s.status = 'active'; s.calibrationCount = 0; s.losses = 0; }
-            } else if (s.status === 'active' && s.prediction !== null) {
-                // Lógica D'Alembert
+            processStateLogic(s, 37);
+
+            // Verificar Predicción
+            if (s.activePrediction !== null) {
                 const dozen = getDozen(num);
                 const bet = s.bankroll.current * 0.01 * s.level;
                 
-                if (dozen === s.prediction) {
-                    s.bankroll.current += bet * 2;
+                if (dozen === s.activePrediction) {
+                    if (s.status === 'active') s.bankroll.current += bet * 2;
                     s.level = Math.max(1, s.level - 1);
                     s.losses = 0;
-                    showToast(`✅ GANASTE! +$${(bet*2).toFixed(2)}`, 'success');
+                    showToast(`✅ ACIERTO! ${s.status === 'active' ? '+$'+(bet*2).toFixed(0) : '(Virtual)'}`, 'success');
                 } else {
-                    s.bankroll.current -= bet;
+                    if (s.status === 'active') s.bankroll.current -= bet;
                     s.level = Math.min(10, s.level + 1);
                     s.losses++;
-                    showToast(`❌ PERDISTE -$${bet.toFixed(2)}`, 'error');
-                    if (s.losses >= 3) { s.status = 'calibrating'; s.calibrationCount = 0; showToast('⚠️ RECALIBRANDO', 'warning'); }
+                    showToast(`❌ FALLO ${s.status === 'active' ? '-$'+bet.toFixed(0) : '(Virtual)'}`, 'error');
+                    
+                    if (s.losses >= 3) { 
+                        triggerCalibration(s);
+                        showToast('⚠️ 3 FALLOS - RECALIBRANDO', 'warning');
+                    }
                 }
-                s.prediction = null;
+                s.activePrediction = null; // Limpiar predicción
+                document.getElementById('ai-result-container').classList.add('hidden');
             }
 
             saveState();
@@ -247,94 +243,149 @@
             s.history.push(side);
             if (s.history.length > 20) s.history.shift();
 
-            if (s.status === 'collecting' && s.history.length >= 15) {
-                s.status = 'ghosting'; s.ghostCount = 0;
-            } else if (s.status === 'ghosting') {
-                s.ghostCount++;
-                if (s.ghostCount >= 10) { s.status = 'active'; s.ghostCount = 0; }
-            } else if (s.status === 'calibrating') {
-                s.calibrationCount++;
-                if (s.calibrationCount >= 5) { s.status = 'active'; s.calibrationCount = 0; s.losses = 0; }
-            } else if (s.status === 'active' && s.prediction !== null) {
-                // Lógica 1-3-2-4
+            processStateLogic(s, 15);
+
+            if (s.activePrediction !== null) {
                 const base = s.bankroll.current * 0.01;
                 const bet = base * SEQ_1324[s.step % 4];
 
-                if (side === s.prediction) {
-                    s.bankroll.current += bet; // Simplificado 1:1
+                if (side === s.activePrediction) {
+                    if (s.status === 'active') s.bankroll.current += bet;
                     s.step = (s.step + 1) % 4;
                     s.losses = 0;
-                    showToast(`✅ GANASTE! +$${bet.toFixed(2)}`, 'success');
+                    showToast(`✅ ACIERTO!`, 'success');
                 } else if (side !== 'T') {
-                    s.bankroll.current -= bet;
+                    if (s.status === 'active') s.bankroll.current -= bet;
                     s.step = 0;
                     s.losses++;
-                    showToast(`❌ PERDISTE -$${bet.toFixed(2)}`, 'error');
-                    if (s.losses >= 3) { s.status = 'calibrating'; s.calibrationCount = 0; showToast('⚠️ RECALIBRANDO', 'warning'); }
+                    showToast(`❌ FALLO`, 'error');
+                    if (s.losses >= 3) { 
+                        triggerCalibration(s);
+                        showToast('⚠️ RECALIBRANDO', 'warning');
+                    }
                 }
-                s.prediction = null;
+                s.activePrediction = null;
+                document.getElementById('ai-result-container').classList.add('hidden');
             }
 
             saveState();
             updateUI();
         }
 
-        // --- UTILS ---
-        function getDozen(n) { return n === 0 ? 0 : n <= 12 ? 1 : n <= 24 ? 2 : 3; }
-        
-        function setPrediction(val) {
-            const s = state.activeGame === 'roulette' ? state.roulette : state.baccarat;
-            s.prediction = val;
-            updateUI();
-            showToast(`🎯 Predicción registrada: ${val}`);
+        function processStateLogic(s, collectTarget) {
+            if (s.status === 'collecting') {
+                if (s.history.length >= collectTarget) {
+                    s.status = 'ghosting';
+                    s.counter = 0;
+                }
+            } else if (s.status === 'calibrating') {
+                s.counter++;
+                if (s.counter >= 5) {
+                    s.status = 'ghosting'; // Pasa a ghosting tras calibrar
+                    s.counter = 0;
+                }
+            } else if (s.status === 'ghosting') {
+                s.counter++;
+                if (s.counter >= 10) {
+                    s.status = 'active';
+                    s.counter = 0;
+                }
+            }
+        }
+
+        function triggerCalibration(s) {
+            s.status = 'calibrating';
+            s.counter = 0;
+            s.activePrediction = null;
         }
 
         function resetDealer() {
             if(!confirm("¿Cambio de Crupier? Se reiniciará la calibración.")) return;
             const s = state.activeGame === 'roulette' ? state.roulette : state.baccarat;
             s.history = [];
-            s.status = 'calibrating';
-            s.calibrationCount = 0;
-            s.prediction = null;
+            triggerCalibration(s);
             updateUI();
         }
 
-        function switchGame(mode) {
-            state.activeGame = mode;
-            updateUI();
-        }
+        // --- IA GEMINI (DIRECTA) ---
+        async function callGeminiAuto() {
+            if (!state.apiKey) { alert("Configura tu API KEY primero"); toggleSettings(); return; }
+            
+            const btn = document.getElementById('btn-consult-ai');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loader"></div> ANALIZANDO...';
+            btn.disabled = true;
 
-        // --- PROMPT GENERATOR ---
-        function generatePrompt() {
             const isRoul = state.activeGame === 'roulette';
             const s = isRoul ? state.roulette : state.baccarat;
-            const hist = JSON.stringify(s.history);
-            const context = s.status === 'ghosting' ? "MODO FANTASMA (No arriesgar)" : "MODO ACTIVO (Fuego Real)";
             
-            let prompt = "";
-            if (isRoul) {
-                prompt = `CONTEXTO: ${context}\nAnaliza estos números de ruleta: ${hist}. Usa Python para calcular frecuencias y Chi-cuadrado. Aplica estrategia D'Alembert (Nivel ${s.level}, Balance ${s.bankroll.current}). Si la probabilidad es >75%, dame la docena a apostar. Responde: DOCENA: X, CONFIANZA: X%, APUESTA: $X.`;
-            } else {
-                prompt = `CONTEXTO: ${context}\nAnaliza estos resultados de Baccarat: ${hist}. Usa Python para detectar patrones. Aplica sistema 1-3-2-4 (Paso ${s.step + 1}, Balance ${s.bankroll.current}). Si la probabilidad es >75%, dame el lado. Responde: LADO: P/B, CONFIANZA: X%, APUESTA: $X.`;
-            }
+            // Prompt Matemático
+            const promptText = isRoul 
+                ? `Analiza estos números de ruleta: ${JSON.stringify(s.history)}. Usa Python para calcular frecuencias y chi-cuadrado. Responde SOLO este JSON: {"prediction": 1, "probability": 85, "analysis": "Tendencia clara"}. (Prediction es 1, 2 o 3 para docenas).`
+                : `Analiza estos resultados de Baccarat: ${JSON.stringify(s.history)}. Usa Python para detectar patrones. Responde SOLO este JSON: {"prediction": "P", "probability": 80, "analysis": "Racha detectada"}. (Prediction es P o B).`;
 
-            navigator.clipboard.writeText(prompt).then(() => showToast("✅ Prompt Copiado"));
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }],
+                        tools: [{ code_execution: {} }] // Activar Python
+                    })
+                });
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+                
+                // Limpieza JSON
+                const jsonStr = text.replace(/```json|```/g, '').trim();
+                const result = JSON.parse(jsonStr);
+
+                // Mostrar Resultado
+                const container = document.getElementById('ai-result-container');
+                container.classList.remove('hidden');
+                
+                const predText = isRoul ? `DOCENA ${result.prediction}` : (result.prediction === 'P' ? 'PLAYER' : 'BANKER');
+                document.getElementById('ai-prediction-text').innerText = predText;
+                document.getElementById('ai-confidence').innerText = result.probability + '%';
+                document.getElementById('ai-analysis').innerText = result.analysis;
+                
+                // Calcular Apuesta
+                const bet = isRoul 
+                    ? (s.bankroll.current * 0.01 * s.level) 
+                    : (s.bankroll.current * 0.01 * SEQ_1324[s.step % 4]);
+                
+                document.getElementById('ai-bet').innerText = '$' + bet.toFixed(0);
+
+                // Guardar predicción para validación automática
+                s.activePrediction = result.prediction;
+                
+                // Color según confianza
+                const confColor = result.probability > 75 ? 'text-neon-emerald' : 'text-neon-amber';
+                document.getElementById('ai-confidence').className = `text-xl font-bold ${confColor}`;
+
+            } catch (error) {
+                console.error(error);
+                showToast("Error en IA. Revisa tu API Key.", "error");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                saveState();
+            }
         }
 
-        // --- UI RENDERING ---
+        // --- UI ---
         function updateUI() {
             const isRoul = state.activeGame === 'roulette';
             const s = isRoul ? state.roulette : state.baccarat;
 
-            // Toggle Views
+            // Visibilidad
             document.getElementById('game-roulette').classList.toggle('hidden', !isRoul);
             document.getElementById('game-baccarat').classList.toggle('hidden', isRoul);
-            document.getElementById('prediction-inputs-roulette').classList.toggle('hidden', !isRoul);
-            document.getElementById('prediction-inputs-baccarat').classList.toggle('hidden', isRoul);
             
-            // Buttons Style
-            document.getElementById('btn-mode-roulette').className = isRoul ? "p-4 rounded-xl font-bold border border-neon-cyan bg-neon-cyan/10 text-neon-cyan transition-all" : "p-4 rounded-xl font-bold border border-white/10 bg-white/5 text-gray-500 transition-all";
-            document.getElementById('btn-mode-baccarat').className = !isRoul ? "p-4 rounded-xl font-bold border border-neon-emerald bg-neon-emerald/10 text-neon-emerald transition-all" : "p-4 rounded-xl font-bold border border-white/10 bg-white/5 text-gray-500 transition-all";
+            // Botones Modo
+            document.getElementById('btn-mode-roulette').className = isRoul ? "p-4 rounded-xl font-bold border border-neon-cyan bg-neon-cyan/10 text-neon-cyan transition-all flex items-center justify-center gap-2" : "p-4 rounded-xl font-bold border border-white/10 bg-white/5 text-gray-500 transition-all flex items-center justify-center gap-2";
+            document.getElementById('btn-mode-baccarat').className = !isRoul ? "p-4 rounded-xl font-bold border border-neon-emerald bg-neon-emerald/10 text-neon-emerald transition-all flex items-center justify-center gap-2" : "p-4 rounded-xl font-bold border border-white/10 bg-white/5 text-gray-500 transition-all flex items-center justify-center gap-2";
 
             // Stats
             document.getElementById('game-mode-label').innerText = `SISTEMA ${state.activeGame.toUpperCase()}`;
@@ -343,20 +394,22 @@
             document.getElementById('display-stop').innerText = `$${s.bankroll.stopLoss}`;
             document.getElementById('display-strategy').innerText = isRoul ? `Nivel ${s.level}` : `Paso ${s.step + 1}`;
 
-            // Status & Progress
+            // Estado y Progreso
             let statusText = "", progress = 0, colorClass = "text-gray-400";
+            const target = isRoul ? 37 : 15;
+
             if (s.status === 'collecting') {
                 statusText = "RECOLECTANDO";
-                progress = (s.history.length / (isRoul ? 37 : 15)) * 100;
+                progress = (s.history.length / target) * 100;
                 colorClass = "text-neon-cyan";
-            } else if (s.status === 'ghosting') {
-                statusText = `FANTASMA (${s.ghostCount}/10)`;
-                progress = (s.ghostCount / 10) * 100;
-                colorClass = "text-neon-amber";
             } else if (s.status === 'calibrating') {
-                statusText = `CALIBRANDO (${s.calibrationCount}/5)`;
-                progress = (s.calibrationCount / 5) * 100;
+                statusText = `CALIBRANDO (${s.counter}/5)`;
+                progress = (s.counter / 5) * 100;
                 colorClass = "text-neon-crimson";
+            } else if (s.status === 'ghosting') {
+                statusText = `FANTASMA (${s.counter}/10)`;
+                progress = (s.counter / 10) * 100;
+                colorClass = "text-neon-amber";
             } else {
                 statusText = "SISTEMA ACTIVO";
                 progress = 100;
@@ -367,20 +420,20 @@
             document.getElementById('status-text').className = `font-bold ${colorClass}`;
             document.getElementById('progress-text').innerText = `${Math.round(progress)}%`;
             document.getElementById('progress-bar').style.width = `${progress}%`;
-            
-            // Prompt Button
-            const btnPrompt = document.getElementById('btn-gen-prompt');
-            const canGen = s.status !== 'calibrating' && (isRoul ? s.history.length >= 37 : s.history.length >= 15);
-            btnPrompt.disabled = !canGen;
-            btnPrompt.className = canGen ? "py-4 rounded-xl font-bold bg-white text-black hover:bg-neon-cyan flex justify-center gap-2 items-center" : "py-4 rounded-xl font-bold bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed flex justify-center gap-2 items-center";
+            document.getElementById('progress-bar').className = `h-full transition-all duration-500 ${s.status === 'active' ? 'bg-neon-emerald' : s.status === 'ghosting' ? 'bg-neon-amber' : 'bg-neon-cyan'}`;
 
-            // Prediction Indicator
-            const predIndicator = document.getElementById('waiting-prediction');
-            if (s.prediction) {
-                predIndicator.classList.remove('hidden');
-                predIndicator.innerText = `ESPERANDO: ${s.prediction}`;
+            // Botón IA
+            const btnAi = document.getElementById('btn-consult-ai');
+            const btnText = document.getElementById('btn-ai-text');
+            const canConsult = s.status === 'active' || s.status === 'ghosting'; // Permitir en ghosting para ver qué dice
+            
+            btnAi.disabled = !canConsult;
+            if (s.status === 'collecting') {
+                btnAi.className = "w-full py-4 rounded-xl font-bold bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed flex justify-center gap-2 items-center";
+                btnText.innerText = `FALTAN DATOS (${s.history.length}/${target})`;
             } else {
-                predIndicator.classList.add('hidden');
+                btnAi.className = "w-full py-4 rounded-xl font-bold bg-white text-black hover:bg-neon-cyan hover:shadow-[0_0_20px_rgba(0,229,255,0.6)] flex justify-center gap-2 items-center transition-all";
+                btnText.innerText = "CONSULTAR IA GEMINI";
             }
 
             // Render History
@@ -413,17 +466,21 @@
             });
         }
 
-        // --- STORAGE & SETTINGS ---
-        function saveState() { localStorage.setItem('neon_v5', JSON.stringify(state)); }
+        function getDozen(n) { return n === 0 ? 0 : n <= 12 ? 1 : n <= 24 ? 2 : 3; }
+        function switchGame(mode) { state.activeGame = mode; updateUI(); }
+        
+        function saveState() { localStorage.setItem('neon_v6', JSON.stringify(state)); }
         function loadState() {
-            const saved = localStorage.getItem('neon_v5');
+            const saved = localStorage.getItem('neon_v6');
             if (saved) state = JSON.parse(saved);
+            document.getElementById('input-api-key').value = state.apiKey || '';
         }
         function toggleSettings() { document.getElementById('settings-panel').classList.toggle('hidden'); }
         function saveSettings() {
+            state.apiKey = document.getElementById('input-api-key').value;
             const s = state.activeGame === 'roulette' ? state.roulette : state.baccarat;
             s.bankroll.initial = parseFloat(document.getElementById('input-initial').value) || s.bankroll.initial;
-            s.bankroll.current = s.bankroll.initial; // Reset current on change
+            s.bankroll.current = s.bankroll.initial;
             s.bankroll.target = parseFloat(document.getElementById('input-target').value) || s.bankroll.target;
             s.bankroll.stopLoss = parseFloat(document.getElementById('input-stop').value) || s.bankroll.stopLoss;
             toggleSettings();
@@ -439,7 +496,6 @@
             setTimeout(() => t.style.display = 'none', 3000);
         }
 
-        // Start
         init();
     </script>
 </body>
