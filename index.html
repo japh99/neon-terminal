@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SPEEDSTER V13 - FINAL</title>
+    <title>NEON SNIPER V15</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
@@ -30,8 +30,6 @@
         .green-num { background: rgba(5, 150, 105, 0.3); border: 1px solid rgba(5, 150, 105, 0.5); color: #6ee7b7; }
         .toast { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 10px; z-index: 100; animation: slideIn 0.3s; display: none; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .loader { border: 3px solid rgba(255,255,255,0.1); border-left-color: #00e5ff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen p-2 font-sans selection:bg-neon-cyan/30">
@@ -42,9 +40,9 @@
         <header class="glass rounded-2xl p-4 relative overflow-hidden">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-3">
-                    <i data-lucide="zap" class="text-neon-cyan w-6 h-6"></i>
+                    <i data-lucide="crosshair" class="text-neon-cyan w-6 h-6"></i>
                     <div>
-                        <h1 class="text-xl font-bold tracking-widest">SPEEDSTER <span class="text-neon-cyan">V13</span></h1>
+                        <h1 class="text-xl font-bold tracking-widest">SNIPER <span class="text-neon-cyan">V15</span></h1>
                         <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em]" id="game-mode-label">RULETA</p>
                     </div>
                 </div>
@@ -85,11 +83,7 @@
 
         <!-- SETTINGS MODAL -->
         <div id="settings-panel" class="glass p-6 rounded-2xl hidden mb-6 border-l-4 border-neon-amber animate-pulse-fast">
-            <h3 class="text-neon-amber font-bold mb-4 flex items-center gap-2"><i data-lucide="key"></i> CONFIGURACIÓN</h3>
-            <div class="mb-4">
-                <label class="text-xs text-neon-cyan font-bold block mb-2">GEMINI API KEY:</label>
-                <input type="text" id="input-api-key" class="w-full bg-black border border-neon-cyan/50 rounded-xl p-3 text-white text-sm focus:outline-none" placeholder="AIzaSy...">
-            </div>
+            <h3 class="text-neon-amber font-bold mb-4 flex items-center gap-2"><i data-lucide="sliders"></i> CONFIGURACIÓN</h3>
             <div class="grid grid-cols-3 gap-2 mb-4">
                 <input type="number" id="input-initial" class="bg-white/5 border border-white/20 rounded p-2 text-white text-sm" placeholder="Capital">
                 <input type="number" id="input-target" class="bg-white/5 border border-white/20 rounded p-2 text-white text-sm" placeholder="Meta">
@@ -98,23 +92,26 @@
             <button onclick="saveSettings()" class="w-full bg-neon-emerald text-black py-3 rounded-xl font-bold hover:bg-emerald-400">GUARDAR</button>
         </div>
 
-        <!-- AI CONTROL -->
-        <div id="ai-section" class="glass p-4 rounded-2xl border border-white/10 hidden">
+        <!-- PREDICTION PANEL -->
+        <div id="prediction-panel" class="glass p-4 rounded-2xl border border-white/10 hidden">
             <div class="flex justify-between items-center mb-2">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="brain-circuit"></i> ANÁLISIS IA</h3>
-                <span id="ai-phase-badge" class="text-[10px] bg-white/10 px-2 py-1 rounded text-gray-400">ESPERANDO DATOS</span>
+                <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="target"></i> OBJETIVO</h3>
+                <span id="phase-badge" class="text-[10px] bg-neon-amber/20 text-neon-amber px-2 py-1 rounded font-bold">FANTASMA</span>
             </div>
             
-            <!-- BOTÓN DE ACCIÓN PRINCIPAL -->
-            <button onclick="triggerAIAnalysis()" id="btn-ai-action" class="w-full py-3 rounded-xl font-bold bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed flex justify-center gap-2 items-center transition-all" disabled>
-                <span>RECOLECTANDO DATOS...</span>
-            </button>
-
-            <!-- RESULTADO -->
-            <div id="ai-result-box" class="mt-3 hidden p-3 bg-black/40 rounded-xl border border-white/10 text-center">
-                <p class="text-xs text-gray-400">TENDENCIA DETECTADA:</p>
-                <p id="ai-prediction-display" class="text-2xl font-black text-neon-cyan my-1">---</p>
-                <p id="ai-confidence-display" class="text-xs font-bold text-neon-emerald">---</p>
+            <div class="text-center py-2">
+                <div id="pred-main" class="text-4xl font-black text-white mb-1 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">---</div>
+                <div class="flex justify-center gap-4">
+                    <div class="text-center">
+                        <p class="text-[10px] text-gray-400">CONFIANZA</p>
+                        <p id="pred-confidence" class="text-lg font-bold text-neon-cyan">0%</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[10px] text-gray-400">ACIERTOS GHOST</p>
+                        <p id="pred-ghost-stats" class="text-lg font-bold text-neon-emerald">0/0</p>
+                    </div>
+                </div>
+                <p id="pred-reason" class="text-[10px] text-gray-400 mt-2 italic">Esperando datos...</p>
             </div>
         </div>
 
@@ -153,27 +150,26 @@
     <script>
         // --- ESTADO GLOBAL ---
         let state = {
-            apiKey: '',
             activeGame: 'roulette',
             roulette: {
                 history: [],
                 bankroll: { current: 1000, initial: 1000, target: 1500, stopLoss: 500 },
                 level: 1,
                 losses: 0,
-                prediction: null, // La docena que dijo la IA
-                status: 'collecting', // collecting (0-37) -> analyzing -> ghosting (0-10) -> active
-                counter: 0,
-                ghostWins: 0
+                status: 'collecting', // collecting -> ghosting -> active
+                ghostWins: 0,
+                ghostTotal: 0,
+                nextPrediction: null // La predicción para el SIGUIENTE tiro
             },
             baccarat: {
                 history: [],
                 bankroll: { current: 1000, initial: 1000, target: 1500, stopLoss: 500 },
                 step: 0,
                 losses: 0,
-                prediction: null,
                 status: 'collecting',
-                counter: 0,
-                ghostWins: 0
+                ghostWins: 0,
+                ghostTotal: 0,
+                nextPrediction: null
             }
         };
 
@@ -187,63 +183,125 @@
             lucide.createIcons();
         }
 
-        // --- LÓGICA DE JUEGO ---
+        // --- LÓGICA MATEMÁTICA PURA ---
+        function calculatePrediction(game) {
+            const s = game === 'roulette' ? state.roulette : state.baccarat;
+            const hist = s.history;
+            
+            if (game === 'roulette') {
+                // Algoritmo de Frecuencia Ponderada (Últimos 37)
+                const window = hist.slice(-37);
+                const dozens = {1:0, 2:0, 3:0};
+                
+                // Peso: Los últimos 10 valen doble
+                window.forEach((n, i) => {
+                    if (n !== 0) {
+                        const doz = getDozen(n);
+                        const weight = i >= 27 ? 2 : 1;
+                        dozens[doz] += weight;
+                    }
+                });
+
+                // Encontrar la docena más caliente
+                let best = 1;
+                if (dozens[2] > dozens[1]) best = 2;
+                if (dozens[3] > dozens[best]) best = 3;
+
+                // Calcular confianza
+                const totalWeight = window.length + 10; // Aprox
+                const confidence = Math.min(95, Math.round((dozens[best] / totalWeight) * 100) + 20);
+
+                return { val: best, conf: confidence, reason: `Tendencia D${best} (Peso: ${dozens[best]})` };
+
+            } else {
+                // Baccarat: Patrones
+                const window = hist.slice(-20);
+                const p = window.filter(x=>x==='P').length;
+                const b = window.filter(x=>x==='B').length;
+                
+                // Detectar ZigZag
+                let zigzags = 0;
+                for(let i=1; i<window.length; i++) {
+                    if(window[i] !== window[i-1]) zigzags++;
+                }
+                
+                const last = window[window.length-1];
+                let pred = last;
+                let reason = "Seguir Racha";
+                
+                if (zigzags > window.length * 0.6) {
+                    pred = last === 'P' ? 'B' : 'P';
+                    reason = "Patrón ZigZag";
+                } else if (b > p + 3) {
+                    pred = 'B';
+                    reason = "Dominio Banker";
+                }
+
+                return { val: pred, conf: 75, reason: reason };
+            }
+        }
+
+        // --- REGISTRO DE DATOS ---
         function registerRoulette(num) {
             const s = state.roulette;
-            s.history.push(num);
-            if (s.history.length > 47) s.history.shift(); // Mantener historial manejable
-
-            // Lógica de Fases
-            if (s.status === 'collecting') {
-                if (s.history.length >= 37) {
-                    // LISTO PARA ANÁLISIS
-                    document.getElementById('ai-section').classList.remove('hidden');
-                    updateUI();
-                    return; // Espera a que el usuario pulse "ANALIZAR"
-                }
-            } 
-            else if (s.status === 'ghosting') {
-                s.counter++;
-                // Verificar si la predicción de la IA se cumple en fantasma
-                if (s.prediction !== null) {
-                    const dozen = getDozen(num);
-                    if (dozen === s.prediction) s.ghostWins++;
-                }
-                
-                if (s.counter >= 10) {
-                    // Fin de Ghosting - Evaluar
-                    if (s.ghostWins >= 4) { // 40% de acierto en docenas es muy bueno
-                        s.status = 'active';
-                        showToast("✅ CALIBRACIÓN EXITOSA: FUEGO REAL", "success");
-                    } else {
-                        showToast("⚠️ CALIBRACIÓN FALLIDA: REINICIANDO", "error");
-                        resetDealer();
-                        return;
-                    }
-                }
-            } 
-            else if (s.status === 'active' && s.prediction !== null) {
-                // FUEGO REAL
+            
+            // 1. Verificar predicción ANTERIOR (si existía)
+            if (s.nextPrediction !== null) {
                 const dozen = getDozen(num);
-                const bet = calculateBetAmount(s, 'roulette');
+                const won = dozen === s.nextPrediction.val;
                 
-                if (dozen === s.prediction) {
-                    s.bankroll.current += bet * 2;
-                    s.level = Math.max(1, s.level - 1);
-                    s.losses = 0;
-                    showToast(`✅ GANASTE +$${(bet*2).toFixed(0)}`, 'success');
-                } else {
-                    s.bankroll.current -= bet;
-                    s.level = Math.min(10, s.level + 1);
-                    s.losses++;
-                    showToast(`❌ PERDISTE -$${bet.toFixed(0)}`, 'error');
+                if (s.status === 'ghosting') {
+                    s.ghostTotal++;
+                    if (won) s.ghostWins++;
                     
-                    if (s.losses >= 3) { 
-                        s.status = 'collecting'; // Volver a recolectar para recalibrar
-                        s.history = []; // Limpiar para nueva muestra
-                        showToast('⚠️ 3 FALLOS - RECALIBRANDO', 'warning');
+                    // Evaluar fin de Ghosting (10 tiros)
+                    if (s.ghostTotal >= 10) {
+                        const rate = (s.ghostWins / s.ghostTotal) * 100;
+                        if (rate >= 40) { // 40% en docenas es excelente
+                            s.status = 'active';
+                            showToast(`🎯 CALIBRADO: ${rate.toFixed(0)}% ACIERTO`, 'success');
+                        } else {
+                            showToast(`⚠️ BAJO ACIERTO (${rate.toFixed(0)}%). REINICIANDO`, 'error');
+                            resetDealer();
+                            return;
+                        }
+                    }
+                } else if (s.status === 'active') {
+                    const bet = calculateBetAmount(s, 'roulette');
+                    if (won) {
+                        s.bankroll.current += bet * 2;
+                        s.level = Math.max(1, s.level - 1);
+                        s.losses = 0;
+                        showToast(`✅ GANASTE +$${bet*2}`, 'success');
+                    } else {
+                        s.bankroll.current -= bet;
+                        s.level = Math.min(10, s.level + 1);
+                        s.losses++;
+                        showToast(`❌ PERDISTE -$${bet}`, 'error');
+                        if (s.losses >= 3) {
+                            s.status = 'ghosting'; // Volver a calibrar
+                            s.ghostTotal = 0; s.ghostWins = 0;
+                            showToast('⚠️ 3 FALLOS - RECALIBRANDO', 'warning');
+                        }
                     }
                 }
+            }
+
+            // 2. Agregar al historial
+            s.history.push(num);
+            if (s.history.length > 37) s.history.shift();
+
+            // 3. Transición a Ghosting
+            if (s.status === 'collecting' && s.history.length >= 37) {
+                s.status = 'ghosting';
+                s.ghostTotal = 0;
+                s.ghostWins = 0;
+                showToast("👻 INICIANDO FASE FANTASMA", "info");
+            }
+
+            // 4. Generar NUEVA predicción para el siguiente tiro
+            if (s.status !== 'collecting') {
+                s.nextPrediction = calculatePrediction('roulette');
             }
 
             saveState();
@@ -252,118 +310,58 @@
 
         function registerBaccarat(side) {
             const s = state.baccarat;
-            s.history.push(side);
             
-            if (s.status === 'collecting' && s.history.length >= 15) {
-                document.getElementById('ai-section').classList.remove('hidden');
-                updateUI();
-                return;
-            }
-            else if (s.status === 'ghosting') {
-                s.counter++;
-                if (s.prediction !== null && side === s.prediction) s.ghostWins++;
+            if (s.nextPrediction !== null) {
+                const won = side === s.nextPrediction.val;
                 
-                if (s.counter >= 10) {
-                    if (s.ghostWins >= 6) { // 60% en baccarat
-                        s.status = 'active';
-                        showToast("✅ CALIBRACIÓN EXITOSA", "success");
-                    } else {
-                        resetDealer();
-                        return;
+                if (s.status === 'ghosting') {
+                    s.ghostTotal++;
+                    if (won) s.ghostWins++;
+                    if (s.ghostTotal >= 10) {
+                        if ((s.ghostWins/s.ghostTotal) >= 0.6) {
+                            s.status = 'active';
+                            showToast("✅ CALIBRADO", 'success');
+                        } else {
+                            resetDealer();
+                            return;
+                        }
+                    }
+                } else if (s.status === 'active') {
+                    const bet = calculateBetAmount(s, 'baccarat');
+                    if (won) {
+                        s.bankroll.current += bet;
+                        s.step = (s.step + 1) % 4;
+                        s.losses = 0;
+                        showToast(`✅ GANASTE`, 'success');
+                    } else if (side !== 'T') {
+                        s.bankroll.current -= bet;
+                        s.step = 0;
+                        s.losses++;
+                        showToast(`❌ PERDISTE`, 'error');
+                        if (s.losses >= 3) {
+                            s.status = 'ghosting'; s.ghostTotal = 0; s.ghostWins = 0;
+                            showToast('⚠️ RECALIBRANDO', 'warning');
+                        }
                     }
                 }
             }
-            else if (s.status === 'active' && s.prediction !== null) {
-                const bet = calculateBetAmount(s, 'baccarat');
-                if (side === s.prediction) {
-                    s.bankroll.current += bet;
-                    s.step = (s.step + 1) % 4;
-                    s.losses = 0;
-                    showToast(`✅ GANASTE`, 'success');
-                } else if (side !== 'T') {
-                    s.bankroll.current -= bet;
-                    s.step = 0;
-                    s.losses++;
-                    showToast(`❌ PERDISTE`, 'error');
-                    if (s.losses >= 3) { 
-                        s.status = 'collecting';
-                        s.history = [];
-                        showToast('⚠️ RECALIBRANDO', 'warning');
-                    }
-                }
+
+            s.history.push(side);
+            if (s.history.length > 20) s.history.shift();
+
+            if (s.status === 'collecting' && s.history.length >= 15) {
+                s.status = 'ghosting'; s.ghostTotal = 0; s.ghostWins = 0;
             }
+
+            if (s.status !== 'collecting') {
+                s.nextPrediction = calculatePrediction('baccarat');
+            }
+
             saveState();
             updateUI();
         }
 
-        // --- IA GEMINI (OPTIMIZADA V13) ---
-        async function triggerAIAnalysis() {
-            if (!state.apiKey) { alert("⚠️ Configura tu API KEY primero"); toggleSettings(); return; }
-            
-            const btn = document.getElementById('btn-ai-action');
-            btn.innerHTML = '<div class="loader"></div> PROCESANDO...';
-            btn.disabled = true;
-
-            const isRoul = state.activeGame === 'roulette';
-            const s = isRoul ? state.roulette : state.baccarat;
-            
-            // Prompt Corto y Directo (Sin Code Execution para velocidad)
-            const promptText = isRoul 
-                ? `Analiza estos 37 números de ruleta: ${JSON.stringify(s.history)}. Calcula frecuencias. Dime SOLO la docena más probable (1, 2 o 3) y su probabilidad. JSON: {"p": 1, "c": 80}`
-                : `Analiza estos 15 resultados de Baccarat: ${JSON.stringify(s.history)}. Busca patrones. Dime SOLO el lado más probable (P o B) y probabilidad. JSON: {"p": "P", "c": 80}`;
-
-            try {
-                // URL CORREGIDA: Usamos gemini-1.5-flash-latest
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey.trim()}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }],
-                        generationConfig: { temperature: 0 } // Determinista = Rápido
-                    })
-                });
-
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.error.message);
-                }
-
-                const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
-                const jsonStr = text.replace(/```json|```/g, '').trim();
-                const result = JSON.parse(jsonStr);
-
-                // Aplicar Resultado
-                s.prediction = result.p;
-                s.status = 'ghosting'; // Pasar a fase fantasma
-                s.counter = 0;
-                s.ghostWins = 0;
-
-                // Mostrar en UI
-                document.getElementById('ai-result-box').classList.remove('hidden');
-                document.getElementById('ai-prediction-display').innerText = isRoul ? `DOCENA ${result.p}` : (result.p === 'P' ? 'PLAYER' : 'BANKER');
-                document.getElementById('ai-confidence-display').innerText = `CONFIANZA: ${result.c}%`;
-
-                showToast("🤖 ANÁLISIS COMPLETADO. INICIANDO FASE FANTASMA (10 TIROS)", "success");
-
-            } catch (error) {
-                console.error(error);
-                // Fallback: Generar Prompt Manual si falla la API
-                const manualPrompt = isRoul 
-                    ? `Analiza: ${JSON.stringify(s.history)}. Usa Python. Dame la mejor docena.`
-                    : `Analiza: ${JSON.stringify(s.history)}. Usa Python. Dame P o B.`;
-                
-                navigator.clipboard.writeText(manualPrompt);
-                alert("⚠️ API Lenta/Error. Prompt copiado. Pégalo en AI Studio.");
-                window.open('https://aistudio.google.com/app/prompts/new_chat', '_blank');
-            } finally {
-                btn.disabled = false;
-                saveState();
-                updateUI();
-            }
-        }
-
-        // --- UTILS & UI ---
+        // --- UTILS ---
         function calculateBetAmount(s, game) {
             const baseUnit = s.bankroll.current * 0.01;
             if (game === 'roulette') return Math.floor(baseUnit * s.level);
@@ -372,10 +370,11 @@
 
         function getDozen(n) { return n === 0 ? 0 : n <= 12 ? 1 : n <= 24 ? 2 : 3; }
         function switchGame(mode) { state.activeGame = mode; updateUI(); }
+        
         function resetDealer() {
-            if(!confirm("¿Reiniciar?")) return;
+            if(!confirm("¿Cambio de Crupier?")) return;
             const s = state.activeGame === 'roulette' ? state.roulette : state.baccarat;
-            s.history = []; s.status = 'collecting'; s.prediction = null;
+            s.history = []; s.status = 'collecting'; s.nextPrediction = null;
             updateUI();
         }
 
@@ -387,7 +386,7 @@
             // Visibilidad
             document.getElementById('game-roulette').classList.toggle('hidden', !isRoul);
             document.getElementById('game-baccarat').classList.toggle('hidden', isRoul);
-            document.getElementById('ai-section').classList.toggle('hidden', s.status === 'collecting');
+            document.getElementById('prediction-panel').classList.toggle('hidden', s.status === 'collecting');
 
             // Botones Modo
             document.getElementById('btn-mode-roulette').className = isRoul ? "p-3 rounded-xl font-bold border border-neon-cyan bg-neon-cyan/10 text-neon-cyan text-sm" : "p-3 rounded-xl font-bold border border-white/10 bg-white/5 text-gray-500 text-sm";
@@ -411,8 +410,8 @@
                 progress = (s.history.length / target) * 100;
                 colorClass = "text-neon-cyan";
             } else if (s.status === 'ghosting') {
-                statusText = `FANTASMA (${s.counter}/10)`;
-                progress = (s.counter / 10) * 100;
+                statusText = `FANTASMA (${s.ghostTotal}/10)`;
+                progress = (s.ghostTotal / 10) * 100;
                 colorClass = "text-neon-amber";
             } else {
                 statusText = "FUEGO REAL";
@@ -426,18 +425,16 @@
             document.getElementById('progress-bar').style.width = `${progress}%`;
             document.getElementById('progress-bar').className = `h-full transition-all duration-300 ${s.status === 'active' ? 'bg-neon-emerald' : s.status === 'ghosting' ? 'bg-neon-amber' : 'bg-neon-cyan'}`;
 
-            // Botón IA
-            const btnAi = document.getElementById('btn-ai-action');
-            if (s.status === 'collecting') {
-                // Oculto o deshabilitado
-            } else if (s.status === 'ghosting' || s.status === 'active') {
-                btnAi.innerHTML = `PREDICCIÓN ACTIVA: ${s.prediction}`;
-                btnAi.className = "w-full py-3 rounded-xl font-bold bg-neon-cyan/10 text-neon-cyan border border-neon-cyan cursor-default";
-            } else {
-                // Listo para analizar
-                btnAi.innerHTML = `<i data-lucide="zap" class="w-4 h-4"></i> ANALIZAR TENDENCIA`;
-                btnAi.className = "w-full py-3 rounded-xl font-bold bg-white text-black hover:bg-neon-cyan transition-all flex justify-center gap-2 items-center";
-                btnAi.disabled = false;
+            // Prediction Panel
+            if (s.nextPrediction) {
+                const predText = isRoul ? `DOCENA ${s.nextPrediction.val}` : (s.nextPrediction.val === 'P' ? 'PLAYER' : 'BANKER');
+                document.getElementById('pred-main').innerText = predText;
+                document.getElementById('pred-confidence').innerText = s.nextPrediction.conf + '%';
+                document.getElementById('pred-reason').innerText = s.nextPrediction.reason;
+                document.getElementById('pred-ghost-stats').innerText = `${s.ghostWins}/${s.ghostTotal}`;
+                
+                document.getElementById('phase-badge').innerText = s.status === 'active' ? 'APUESTA REAL' : 'FANTASMA';
+                document.getElementById('phase-badge').className = `text-[10px] px-2 py-1 rounded font-bold ${s.status === 'active' ? 'bg-neon-emerald/20 text-neon-emerald' : 'bg-neon-amber/20 text-neon-amber'}`;
             }
 
             renderHistory(s.history, isRoul);
@@ -469,15 +466,13 @@
             });
         }
 
-        function saveState() { localStorage.setItem('neon_v13', JSON.stringify(state)); }
+        function saveState() { localStorage.setItem('neon_v15', JSON.stringify(state)); }
         function loadState() {
-            const saved = localStorage.getItem('neon_v13');
+            const saved = localStorage.getItem('neon_v15');
             if (saved) state = JSON.parse(saved);
-            document.getElementById('input-api-key').value = state.apiKey || '';
         }
         function toggleSettings() { document.getElementById('settings-panel').classList.toggle('hidden'); }
         function saveSettings() {
-            state.apiKey = document.getElementById('input-api-key').value.trim();
             const s = state.activeGame === 'roulette' ? state.roulette : state.baccarat;
             s.bankroll.initial = parseFloat(document.getElementById('input-initial').value) || s.bankroll.initial;
             s.bankroll.current = s.bankroll.initial;
