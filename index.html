@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON PRECISION V8 - FINAL</title>
+    <title>NEON PRECISION V9 - FIXED</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
@@ -44,7 +44,7 @@
                 <div class="flex items-center gap-3">
                     <i data-lucide="cpu" class="text-neon-cyan w-8 h-8"></i>
                     <div>
-                        <h1 class="text-2xl font-bold tracking-widest">NEON <span class="text-neon-cyan">V8</span></h1>
+                        <h1 class="text-2xl font-bold tracking-widest">NEON <span class="text-neon-cyan">V9</span></h1>
                         <p class="text-xs text-gray-500 uppercase tracking-[0.2em]" id="game-mode-label">SISTEMA RULETA</p>
                     </div>
                 </div>
@@ -90,8 +90,9 @@
             
             <div class="mb-6">
                 <label class="text-xs text-neon-cyan font-bold block mb-2">PEGAR API KEY DE GEMINI AQUÍ:</label>
+                <!-- Cambiado a type="text" para ver si hay espacios -->
                 <input type="text" id="input-api-key" class="w-full bg-black border border-neon-cyan/50 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-neon-cyan" placeholder="AIzaSy...">
-                <p class="text-[10px] text-gray-500 mt-1">La clave se guarda solo en tu dispositivo.</p>
+                <p class="text-[10px] text-gray-500 mt-1">Asegúrate de no dejar espacios al inicio o final.</p>
             </div>
 
             <div class="grid grid-cols-3 gap-4 mb-4">
@@ -338,7 +339,7 @@
             updateUI();
         }
 
-        // --- IA GEMINI (DIRECTA V8) ---
+        // --- IA GEMINI (CORREGIDA V9) ---
         async function callGeminiAuto() {
             if (!state.apiKey) { alert("⚠️ PEGA TU API KEY EN AJUSTES PRIMERO"); toggleSettings(); return; }
             
@@ -350,14 +351,14 @@
             const isRoul = state.activeGame === 'roulette';
             const s = isRoul ? state.roulette : state.baccarat;
             
-            // Prompt Simplificado para evitar errores de Code Execution en navegador
+            // Prompt Simplificado (Sin code_execution para evitar errores de navegador)
             const promptText = isRoul 
                 ? `Actúa como experto en ruleta. Historial: ${JSON.stringify(s.history)}. Calcula frecuencias y ley del tercio paso a paso. Responde SOLO este JSON: {"prediction": 1, "probability": 85, "analysis": "Tendencia clara"}. (Prediction es 1, 2 o 3 para docenas).`
                 : `Actúa como experto en baccarat. Historial: ${JSON.stringify(s.history)}. Detecta patrones paso a paso. Responde SOLO este JSON: {"prediction": "P", "probability": 80, "analysis": "Racha detectada"}. (Prediction es P o B).`;
 
             try {
-                // Usamos la API estándar sin tools para evitar bloqueos de navegador
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey.trim()}`, {
+                // URL CORREGIDA: Usamos gemini-1.5-flash-latest
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey.trim()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -503,9 +504,9 @@
         function getDozen(n) { return n === 0 ? 0 : n <= 12 ? 1 : n <= 24 ? 2 : 3; }
         function switchGame(mode) { state.activeGame = mode; updateUI(); }
         
-        function saveState() { localStorage.setItem('neon_v7', JSON.stringify(state)); }
+        function saveState() { localStorage.setItem('neon_v9', JSON.stringify(state)); }
         function loadState() {
-            const saved = localStorage.getItem('neon_v7');
+            const saved = localStorage.getItem('neon_v9');
             if (saved) state = JSON.parse(saved);
             document.getElementById('input-api-key').value = state.apiKey || '';
         }
