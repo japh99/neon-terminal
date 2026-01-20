@@ -4,973 +4,1612 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NEON PRECISION V18 - OFFLINE MASTER</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500&display=swap');
+        
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-emerald: #00ff9d;
+            --neon-crimson: #ff0055;
+            --neon-purple: #9d00ff;
+            --bg-dark: #0a0a0f;
+        }
         
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
-
-        body {
-            font-family: 'Orbitron', monospace;
-            background: #000;
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .neon-cyan { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
-        .neon-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
-        .neon-crimson { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
         
-        .chip {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--bg-dark);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(157, 0, 255, 0.05) 0%, transparent 20%);
+        }
+        
+        .cyber-card {
+            background: rgba(20, 20, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 
+                0 0 20px rgba(0, 243, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .cyber-card-emerald {
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 157, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .cyber-card-crimson {
+            border: 1px solid rgba(255, 0, 85, 0.2);
+            box-shadow: 
+                0 0 20px rgba(255, 0, 85, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .neon-text-cyan {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+        }
+        
+        .neon-text-emerald {
+            color: var(--neon-emerald);
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.7);
+        }
+        
+        .neon-text-crimson {
+            color: var(--neon-crimson);
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.7);
+        }
+        
+        .neon-border-cyan {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+        
+        .neon-border-emerald {
+            border-color: var(--neon-emerald);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.5);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 243, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 243, 255, 0); }
+        }
+        
+        .glow {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.3); }
+            to { box-shadow: 0 0 15px rgba(0, 243, 255, 0.8), 0 0 25px rgba(0, 243, 255, 0.5); }
+        }
+        
+        .game-btn {
+            transition: all 0.2s ease;
+            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .game-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .number-chip {
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
             font-weight: bold;
-            font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 3px solid;
-            position: relative;
+            transition: all 0.2s ease;
+            user-select: none;
         }
-
-        .chip:active {
+        
+        .number-chip:active {
             transform: scale(0.9);
         }
-
-        .chip.selected {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px currentColor;
+        
+        .phase-indicator {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
-
-        .chip-1k { background: #1f2937; border-color: #374151; color: #fff; }
-        .chip-2.5k { background: #b45309; border-color: #d97706; color: #fff; }
-        .chip-5k { background: #0369a1; border-color: #0284c7; color: #fff; }
-        .chip-25k { background: #991b1b; border-color: #dc2626; color: #fff; }
-        .chip-100k { background: #065f46; border-color: #059669; color: #fff; }
-        .chip-500k { background: #1f2937; border-color: #6b7280; color: #fff; }
-        .chip-1.2m { background: #831843; border-color: #be185d; color: #fff; }
-        .chip-5m { background: #1e3a8a; border-color: #2563eb; color: #fff; }
-
-        .chip-500 { background: linear-gradient(135deg, #b45309 0%, #d97706 100%); border-color: #fbbf24; color: #fff; }
-        .chip-2500-r { background: linear-gradient(135deg, #b45309 0%, #92400e 100%); border-color: #d97706; color: #fff; }
-        .chip-5000 { background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%); border-color: #38bdf8; color: #fff; }
-        .chip-25000 { background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%); border-color: #f87171; color: #fff; }
-        .chip-100000 { background: linear-gradient(135deg, #064e3b 0%, #059669 100%); border-color: #34d399; color: #fff; }
-        .chip-500000 { background: linear-gradient(135deg, #1f2937 0%, #4b5563 100%); border-color: #9ca3af; color: #fff; }
-        .chip-1200000 { background: linear-gradient(135deg, #831843 0%, #be185d 100%); border-color: #f9a8d4; color: #fff; }
-        .chip-5000000 { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-color: #93c5fd; color: #fff; }
-
-        .number-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
+        
+        .history-chip {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
             font-weight: bold;
-            font-size: 16px;
-            transition: all 0.15s;
-            cursor: pointer;
-            border: 2px solid transparent;
+            font-size: 0.9rem;
         }
-
-        .number-btn:active {
-            transform: scale(0.95);
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
-
-        .number-red {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border-color: #ef4444;
+        
+        .tab-btn.active {
+            position: relative;
+            z-index: 10;
         }
-
-        .number-black {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border-color: #374151;
+        
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-
-        .number-green {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            border-color: #10b981;
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 30, 40, 0.5);
+            border-radius: 4px;
         }
-
-        .pulse-animation {
-            animation: pulse 1s infinite;
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 4px;
         }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        
+        /* Estilos para móviles */
+        @media (max-width: 640px) {
+            .game-btn {
+                padding: 10px 16px;
+                font-size: 1rem;
+            }
+            
+            .number-chip {
+                width: 38px;
+                height: 38px;
+                font-size: 0.9rem;
+            }
+            
+            .history-chip {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+            
+            .phase-indicator {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Header -->
-    <div class="glass border-b border-cyan-500/30 px-4 py-3 sticky top-0 z-50">
-        <h1 class="text-2xl md:text-3xl font-black text-center bg-gradient-to-r from-cyan-400 via-emerald-400 to-pink-400 bg-clip-text text-transparent">
-            NEON PRECISION V18
-        </h1>
-        <p class="text-center text-xs text-gray-400 mt-1">OFFLINE MASTER • ZERO LATENCY</p>
-    </div>
+<body class="min-h-screen p-3 md:p-5">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-6 md:mb-8">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold font-['Orbitron'] neon-text-cyan mb-2">
+                NEON PRECISION V18
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 font-['Orbitron']">OFFLINE MASTER</p>
+            <div class="flex flex-wrap justify-center items-center gap-4 mt-4">
+                <div class="phase-indicator bg-gray-800 text-gray-300">SISTEMA LOCAL • 0ms LATENCIA</div>
+                <div class="phase-indicator bg-gray-800 text-gray-300">ALGORITMOS DE PROBABILIDAD</div>
+            </div>
+        </header>
 
-    <!-- Main Container -->
-    <div class="max-w-7xl mx-auto p-2 md:p-4">
-        <!-- Game Selector -->
-        <div class="flex gap-2 mb-4">
-            <button id="btnRoulette" class="flex-1 py-4 rounded-xl font-bold text-lg glass neon-crimson" onclick="switchGame('roulette')">
-                🎯 RULETA
+        <!-- Tabs de juegos -->
+        <div class="flex border-b border-gray-800 mb-6">
+            <button id="tab-roulette" class="tab-btn active bg-gray-900 text-white neon-border-cyan">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="circle"></i>
+                    <span>RULETA EUROPEA</span>
+                </div>
             </button>
-            <button id="btnBaccarat" class="flex-1 py-4 rounded-xl font-bold text-lg glass" onclick="switchGame('baccarat')">
-                🃏 BACCARAT
+            <button id="tab-baccarat" class="tab-btn bg-gray-900 text-gray-400">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="diamond"></i>
+                    <span>BACCARAT</span>
+                </div>
             </button>
         </div>
 
-        <!-- Status Panel -->
-        <div id="statusPanel" class="glass rounded-xl p-4 mb-4 slide-in"></div>
+        <!-- Contenedor principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
+            <!-- Panel izquierdo: Juego -->
+            <div class="lg:col-span-2">
+                <!-- Panel de Ruleta -->
+                <div id="roulette-panel" class="game-panel">
+                    <!-- Fase actual -->
+                    <div class="cyber-card p-4 mb-5">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-xl font-bold flex items-center gap-2">
+                                    <i data-lucide="circle" class="neon-text-cyan"></i>
+                                    <span>RULETA EUROPEA</span>
+                                </h2>
+                                <div id="roulette-phase" class="phase-indicator bg-blue-900/30 text-blue-300 mt-1">FASE 1: RECOLECCIÓN</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-400">Capital Actual</div>
+                                <div class="text-2xl font-bold neon-text-cyan">$<span id="roulette-balance">1000</span></div>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Configuration Panel (Hidden by default) -->
-        <div id="configPanel" class="glass rounded-xl p-4 mb-4 hidden">
-            <h3 class="text-lg font-bold mb-3 text-cyan-400">⚙️ CONFIGURACIÓN</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                    <label class="text-sm text-gray-400">Capital Inicial</label>
-                    <input type="number" id="inputCapital" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 text-white" value="1000000">
+                    <!-- Controles de capital -->
+                    <div class="cyber-card p-4 mb-5">
+                        <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+                            <i data-lucide="trending-up"></i>
+                            <span>GESTIÓN DE CAPITAL</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">Meta</label>
+                                <input type="number" id="roulette-target" value="2000" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">Stop Loss</label>
+                                <input type="number" id="roulette-stop-loss" value="500" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">Unidad Base</label>
+                                <div class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+                                    $<span id="roulette-unit">10</span> (1% del capital)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-3">
+                            <button id="roulette-reset" class="game-btn bg-gray-800 hover:bg-gray-700 text-white">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="refresh-ccw"></i>
+                                    <span>Cambio de Crupier</span>
+                                </div>
+                            </button>
+                            <button id="roulette-clear" class="game-btn bg-red-900/30 hover:bg-red-800/40 text-red-300">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="trash-2"></i>
+                                    <span>Finalizar Sesión</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tablero de ruleta -->
+                    <div class="cyber-card p-4 md:p-5 mb-5">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="grid-3x3"></i>
+                            <span>TABLERO DE NÚMEROS</span>
+                        </h3>
+                        <div class="grid grid-cols-4 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-13 gap-2 mb-4">
+                            <!-- Números 1-36 + 0 -->
+                            <div class="number-chip bg-gray-900 text-white" data-number="0">0</div>
+                            <!-- Generamos números 1-36 -->
+                            <script>
+                                // Esto se generará dinámicamente con JavaScript
+                            </script>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 mb-4">
+                            <button id="roulette-dozen-1" class="game-btn bg-gray-800 hover:bg-gray-700 text-white">1-12</button>
+                            <button id="roulette-dozen-2" class="game-btn bg-gray-800 hover:bg-gray-700 text-white">13-24</button>
+                            <button id="roulette-dozen-3" class="game-btn bg-gray-800 hover:bg-gray-700 text-white">25-36</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="roulette-red" class="game-btn bg-red-900/30 hover:bg-red-800/40 text-red-300">ROJO</button>
+                            <button id="roulette-black" class="game-btn bg-gray-900 hover:bg-gray-800 text-white">NEGRO</button>
+                        </div>
+                    </div>
+
+                    <!-- Panel de predicción -->
+                    <div id="roulette-prediction" class="cyber-card cyber-card-emerald p-4 md:p-5 mb-5">
+                        <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+                            <i data-lucide="zap"></i>
+                            <span>PANEL DE PREDICCIÓN</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
+                                <div class="text-sm text-gray-400 mb-1">PREDICCIÓN</div>
+                                <div id="roulette-prediction-value" class="text-2xl font-bold neon-text-emerald">ESPERAR</div>
+                            </div>
+                            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
+                                <div class="text-sm text-gray-400 mb-1">CONFIANZA</div>
+                                <div id="roulette-confidence" class="text-2xl font-bold neon-text-emerald">0%</div>
+                            </div>
+                            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
+                                <div class="text-sm text-gray-400 mb-1">APUESTA</div>
+                                <div id="roulette-bet" class="text-2xl font-bold neon-text-emerald">$0</div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div id="roulette-prediction-details" class="text-gray-300 text-sm">
+                                Recolectando datos... (0/37 números registrados)
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="text-sm text-gray-400">Meta</label>
-                    <input type="number" id="inputTarget" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 text-white" value="1500000">
-                </div>
-                <div>
-                    <label class="text-sm text-gray-400">Stop Loss</label>
-                    <input type="number" id="inputStopLoss" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 text-white" value="500000">
+
+                <!-- Panel de Baccarat -->
+                <div id="baccarat-panel" class="game-panel hidden">
+                    <!-- Fase actual -->
+                    <div class="cyber-card p-4 mb-5">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-xl font-bold flex items-center gap-2">
+                                    <i data-lucide="diamond" class="neon-text-purple"></i>
+                                    <span>BACCARAT</span>
+                                </h2>
+                                <div id="baccarat-phase" class="phase-indicator bg-purple-900/30 text-purple-300 mt-1">FASE 1: RECOLECCIÓN</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-400">Capital Actual</div>
+                                <div class="text-2xl font-bold neon-text-purple">$<span id="baccarat-balance">1000</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controles de capital -->
+                    <div class="cyber-card p-4 mb-5">
+                        <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+                            <i data-lucide="trending-up"></i>
+                            <span>GESTIÓN DE CAPITAL</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">Meta</label>
+                                <input type="number" id="baccarat-target" value="2000" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">Stop Loss</label>
+                                <input type="number" id="baccarat-stop-loss" value="500" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">Unidad Base</label>
+                                <div class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+                                    $<span id="baccarat-unit">10</span> (1% del capital)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-3">
+                            <button id="baccarat-reset" class="game-btn bg-gray-800 hover:bg-gray-700 text-white">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="refresh-ccw"></i>
+                                    <span>Cambio de Shoe</span>
+                                </div>
+                            </button>
+                            <button id="baccarat-clear" class="game-btn bg-red-900/30 hover:bg-red-800/40 text-red-300">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="trash-2"></i>
+                                    <span>Finalizar Sesión</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tablero de Baccarat -->
+                    <div class="cyber-card p-4 md:p-5 mb-5">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="table"></i>
+                            <span>RESULTADOS BACCARAT</span>
+                        </h3>
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <button id="baccarat-banker" class="game-btn bg-blue-900/30 hover:bg-blue-800/40 text-blue-300 py-4">
+                                <div class="flex flex-col items-center">
+                                    <i data-lucide="shield" class="w-8 h-8 mb-2"></i>
+                                    <span>BANKER (0.9:1)</span>
+                                </div>
+                            </button>
+                            <button id="baccarat-player" class="game-btn bg-red-900/30 hover:bg-red-800/40 text-red-300 py-4">
+                                <div class="flex flex-col items-center">
+                                    <i data-lucide="user" class="w-8 h-8 mb-2"></i>
+                                    <span>PLAYER (1.1:1)</span>
+                                </div>
+                            </button>
+                            <button id="baccarat-tie" class="game-btn bg-gray-800 hover:bg-gray-700 text-white py-4">
+                                <div class="flex flex-col items-center">
+                                    <i data-lucide="equal" class="w-8 h-8 mb-2"></i>
+                                    <span>EMPATE (8:1)</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-400 mb-2">PATRÓN DETECTADO</div>
+                            <div id="baccarat-pattern" class="text-lg font-bold neon-text-emerald">Recolectando datos...</div>
+                        </div>
+                    </div>
+
+                    <!-- Panel de predicción -->
+                    <div id="baccarat-prediction" class="cyber-card cyber-card-emerald p-4 md:p-5">
+                        <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+                            <i data-lucide="zap"></i>
+                            <span>PANEL DE PREDICCIÓN</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
+                                <div class="text-sm text-gray-400 mb-1">PREDICCIÓN</div>
+                                <div id="baccarat-prediction-value" class="text-2xl font-bold neon-text-emerald">ESPERAR</div>
+                            </div>
+                            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
+                                <div class="text-sm text-gray-400 mb-1">CONFIANZA</div>
+                                <div id="baccarat-confidence" class="text-2xl font-bold neon-text-emerald">0%</div>
+                            </div>
+                            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
+                                <div class="text-sm text-gray-400 mb-1">APUESTA</div>
+                                <div id="baccarat-bet" class="text-2xl font-bold neon-text-emerald">$0</div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div id="baccarat-prediction-details" class="text-gray-300 text-sm">
+                                Recolectando datos... (0/15 resultados registrados)
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button onclick="applyConfig()" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 py-2 rounded-lg font-bold">
-                APLICAR
-            </button>
+
+            <!-- Panel derecho: Historial y estadísticas -->
+            <div class="lg:col-span-1">
+                <!-- Historial de Ruleta -->
+                <div id="roulette-history-panel" class="cyber-card p-4 md:p-5 h-full">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i data-lucide="history"></i>
+                        <span>HISTORIAL RULETA</span>
+                    </h3>
+                    <div class="mb-6">
+                        <div class="text-sm text-gray-400 mb-2">ESTADÍSTICAS ACTUALES</div>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-gray-900/50 p-3 rounded-lg">
+                                <div class="text-sm text-gray-400">Números Registrados</div>
+                                <div id="roulette-stats-count" class="text-xl font-bold neon-text-cyan">0</div>
+                            </div>
+                            <div class="bg-gray-900/50 p-3 rounded-lg">
+                                <div class="text-sm text-gray-400">Precisión Fantasma</div>
+                                <div id="roulette-ghost-accuracy" class="text-xl font-bold neon-text-cyan">0%</div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-400 mb-2">ANÁLISIS DE DOCENAS</div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Docena 1 (1-12):</span>
+                                    <span id="roulette-dozen-1-count" class="font-bold">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Docena 2 (13-24):</span>
+                                    <span id="roulette-dozen-2-count" class="font-bold">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Docena 3 (25-36):</span>
+                                    <span id="roulette-dozen-3-count" class="font-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-400 mb-2">ÚLTIMOS NÚMEROS</div>
+                        <div id="roulette-history" class="flex flex-wrap gap-2 mb-4 max-h-60 overflow-y-auto p-2">
+                            <!-- Historial se generará aquí -->
+                        </div>
+                        <div class="text-center">
+                            <button id="roulette-undo" class="game-btn bg-gray-800 hover:bg-gray-700 text-white text-sm">
+                                <div class="flex items-center gap-1">
+                                    <i data-lucide="undo" class="w-4 h-4"></i>
+                                    <span>Deshacer Último</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial de Baccarat -->
+                <div id="baccarat-history-panel" class="cyber-card p-4 md:p-5 h-full hidden">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i data-lucide="history"></i>
+                        <span>HISTORIAL BACCARAT</span>
+                    </h3>
+                    <div class="mb-6">
+                        <div class="text-sm text-gray-400 mb-2">ESTADÍSTICAS ACTUALES</div>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-gray-900/50 p-3 rounded-lg">
+                                <div class="text-sm text-gray-400">Resultados Registrados</div>
+                                <div id="baccarat-stats-count" class="text-xl font-bold neon-text-purple">0</div>
+                            </div>
+                            <div class="bg-gray-900/50 p-3 rounded-lg">
+                                <div class="text-sm text-gray-400">Precisión Fantasma</div>
+                                <div id="baccarat-ghost-accuracy" class="text-xl font-bold neon-text-purple">0%</div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-400 mb-2">DISTRIBUCIÓN ACTUAL</div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Banker:</span>
+                                    <span id="baccarat-banker-count" class="font-bold">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Player:</span>
+                                    <span id="baccarat-player-count" class="font-bold">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Empate:</span>
+                                    <span id="baccarat-tie-count" class="font-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-400 mb-2">ÚLTIMOS RESULTADOS</div>
+                        <div id="baccarat-history" class="flex flex-wrap gap-2 mb-4 max-h-60 overflow-y-auto p-2">
+                            <!-- Historial se generará aquí -->
+                        </div>
+                        <div class="text-center">
+                            <button id="baccarat-undo" class="game-btn bg-gray-800 hover:bg-gray-700 text-white text-sm">
+                                <div class="flex items-center gap-1">
+                                    <i data-lucide="undo" class="w-4 h-4"></i>
+                                    <span>Deshacer Último</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Prediction Panel -->
-        <div id="predictionPanel" class="glass rounded-xl p-4 mb-4"></div>
-
-        <!-- Chips Panel -->
-        <div id="chipsPanel" class="glass rounded-xl p-4 mb-4"></div>
-
-        <!-- Game Interface -->
-        <div id="gameInterface" class="glass rounded-xl p-4 mb-4"></div>
-
-        <!-- Control Buttons -->
-        <div class="grid grid-cols-2 gap-2 mb-4">
-            <button onclick="toggleConfig()" class="glass py-3 rounded-xl font-bold">
-                ⚙️ CONFIG
-            </button>
-            <button onclick="changeCroupier()" class="glass py-3 rounded-xl font-bold text-amber-400">
-                🔄 CAMBIO CRUPIER
-            </button>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="grid grid-cols-2 gap-2">
-            <button onclick="resetSession()" class="bg-red-600/20 border border-red-500 py-3 rounded-xl font-bold text-red-400">
-                🗑️ FINALIZAR SESIÓN
-            </button>
-            <button onclick="exportData()" class="bg-blue-600/20 border border-blue-500 py-3 rounded-xl font-bold text-blue-400">
-                📊 EXPORTAR
-            </button>
-        </div>
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <div class="cyber-card p-4">
+                <p>NEON PRECISION V18 - OFFLINE MASTER • Sistema de probabilidad local • Todos los cálculos se ejecutan en tu dispositivo • 0ms de latencia</p>
+                <p class="mt-2">Los juegos de azar son para entretenimiento. Juega responsablemente.</p>
+            </div>
+        </footer>
     </div>
 
     <script>
-        // ============ ESTADO GLOBAL ============
-        let currentGame = 'roulette';
-        let state = {
-            roulette: {
-                capital: 1000000,
-                initialCapital: 1000000,
-                target: 1500000,
-                stopLoss: 500000,
-                history: [],
-                phase: 'collecting', // collecting, ghosting, active, recalibrating
-                collectionCount: 0,
-                ghostCount: 0,
-                recalibrationCount: 0,
-                dalembertLevel: 1,
-                consecutiveLosses: 0,
-                wins: 0,
-                losses: 0,
-                prediction: null,
-                confidence: 0,
-                selectedChips: []
-            },
-            baccarat: {
-                capital: 1000000,
-                initialCapital: 1000000,
-                target: 1500000,
-                stopLoss: 500000,
-                history: [],
-                phase: 'collecting',
-                collectionCount: 0,
-                ghostCount: 0,
-                recalibrationCount: 0,
-                sequencePosition: 0, // 1-3-2-4
-                consecutiveLosses: 0,
-                wins: 0,
-                losses: 0,
-                prediction: null,
-                confidence: 0,
-                selectedChips: []
-            }
+        // Inicializar Lucide icons
+        lucide.createIcons();
+
+        // Variables globales
+        const APP_VERSION = 'v1.8';
+        const STORAGE_KEY = 'neon_precision_v18';
+        
+        // Estados del sistema
+        const PHASES = {
+            COLLECTION: 1,
+            GHOST: 2,
+            ACTIVE: 3,
+            PROTECTION: 4
         };
 
-        // Constantes
-        const REDS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-        const SEQUENCE_1324 = [1, 3, 2, 4];
+        // Configuración inicial para Ruleta
+        let rouletteState = {
+            game: 'roulette',
+            phase: PHASES.COLLECTION,
+            balance: 1000,
+            target: 2000,
+            stopLoss: 500,
+            unit: 10,
+            history: [],
+            ghostHistory: [],
+            ghostPredictions: [],
+            consecutiveLosses: 0,
+            betSequence: 0,
+            lastBet: 0,
+            dozenCounts: [0, 0, 0],
+            colorCounts: { red: 0, black: 0 },
+            hotNumbers: [],
+            lastPrediction: null,
+            calibrationComplete: false,
+            dataCollected: 0,
+            requiredForCollection: 37,
+            requiredForGhost: 10
+        };
+
+        // Configuración inicial para Baccarat
+        let baccaratState = {
+            game: 'baccarat',
+            phase: PHASES.COLLECTION,
+            balance: 1000,
+            target: 2000,
+            stopLoss: 500,
+            unit: 10,
+            history: [],
+            ghostHistory: [],
+            ghostPredictions: [],
+            consecutiveLosses: 0,
+            betSequence: 0,
+            lastBet: 0,
+            pattern: 'Ninguno',
+            distribution: { banker: 0, player: 0, tie: 0 },
+            streaks: { banker: 0, player: 0 },
+            lastPrediction: null,
+            calibrationComplete: false,
+            dataCollected: 0,
+            requiredForCollection: 15,
+            requiredForGhost: 10
+        };
+
+        // Estado actual del juego activo
+        let currentGame = 'roulette';
         
-        // Fichas Baccarat (imagen 1)
-        const CHIPS_BACCARAT = [
-            { value: 1000, label: '1K', class: 'chip-1k' },
-            { value: 2500, label: '2.5K', class: 'chip-2.5k' },
-            { value: 5000, label: '5K', class: 'chip-5k' },
-            { value: 25000, label: '25K', class: 'chip-25k' },
-            { value: 100000, label: '100K', class: 'chip-100k' },
-            { value: 500000, label: '500K', class: 'chip-500k' },
-            { value: 1200000, label: '1.2M', class: 'chip-1.2m' },
-            { value: 5000000, label: '5M', class: 'chip-5m' }
-        ];
-
-        // Fichas Ruleta (imagen 2)
-        const CHIPS_ROULETTE = [
-            { value: 500, label: '500', class: 'chip-500' },
-            { value: 2500, label: '2.5K', class: 'chip-2500-r' },
-            { value: 5000, label: '5K', class: 'chip-5000' },
-            { value: 25000, label: '25K', class: 'chip-25000' },
-            { value: 100000, label: '100K', class: 'chip-100000' },
-            { value: 500000, label: '500K', class: 'chip-500000' },
-            { value: 1200000, label: '1.2M', class: 'chip-1200000' },
-            { value: 5000000, label: '5M', class: 'chip-5000000' }
-        ];
-
-        // ============ INICIALIZACIÓN ============
-        function init() {
-            loadFromLocalStorage();
-            updateUI();
-        }
-
-        // ============ LOCALSTORAGE ============
-        function saveToLocalStorage() {
-            localStorage.setItem('neonPrecisionV18', JSON.stringify(state));
-        }
-
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('neonPrecisionV18');
+        // Cargar estado guardado
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 try {
-                    state = JSON.parse(saved);
+                    const parsed = JSON.parse(saved);
+                    if (parsed.roulette) {
+                        rouletteState = { ...rouletteState, ...parsed.roulette };
+                    }
+                    if (parsed.baccarat) {
+                        baccaratState = { ...baccaratState, ...parsed.baccarat };
+                    }
+                    if (parsed.currentGame) {
+                        currentGame = parsed.currentGame;
+                    }
                 } catch (e) {
-                    console.error('Error loading state:', e);
+                    console.error('Error cargando estado:', e);
                 }
             }
         }
 
-        // ============ MATEMÁTICA - RULETA ============
-        function analyzeRoulette(history) {
-            if (history.length < 10) {
-                return { dozen: null, confidence: 0, reason: 'Datos insuficientes' };
-            }
-
-            // Contar frecuencias por docena
-            const dozenFreq = { 1: 0, 2: 0, 3: 0, 0: 0 };
-            history.forEach(num => {
-                const dozen = getDozen(num);
-                dozenFreq[dozen]++;
-            });
-
-            // Ley del tercio: buscar docena más fría
-            const dozens = [1, 2, 3];
-            const coldestDozen = dozens.reduce((a, b) => 
-                dozenFreq[a] < dozenFreq[b] ? a : b
-            );
-
-            // Calcular déficit
-            const avgFreq = dozens.reduce((sum, d) => sum + dozenFreq[d], 0) / 3;
-            const deficit = avgFreq - dozenFreq[coldestDozen];
-
-            // Calcular confianza (65% base + déficit)
-            let confidence = 65 + (deficit * 3);
-            confidence = Math.min(confidence, 95);
-
-            // Análisis de zonas calientes
-            const recentNumbers = history.slice(-12);
-            const recentDozens = recentNumbers.map(getDozen).filter(d => d !== 0);
-            const recentFreq = { 1: 0, 2: 0, 3: 0 };
-            recentDozens.forEach(d => recentFreq[d]++);
-
-            // Si una docena está muy caliente recientemente, reducir confianza
-            const maxRecent = Math.max(...Object.values(recentFreq));
-            if (maxRecent > 6) {
-                confidence *= 0.9;
-            }
-
-            return {
-                dozen: coldestDozen,
-                confidence: Math.round(confidence),
-                reason: `Déficit: ${deficit.toFixed(1)} apariciones`,
-                frequencies: dozenFreq
+        // Guardar estado
+        function saveState() {
+            const state = {
+                roulette: rouletteState,
+                baccarat: baccaratState,
+                currentGame: currentGame
             };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
-        function getDozen(num) {
-            if (num === 0) return 0;
-            if (num <= 12) return 1;
-            if (num <= 24) return 2;
-            return 3;
-        }
-
-        // ============ MATEMÁTICA - BACCARAT ============
-        function analyzeBaccarat(history) {
-            if (history.length < 10) {
-                return { side: null, confidence: 0, reason: 'Datos insuficientes' };
-            }
-
-            const sides = history.map(h => h.side);
-            
-            // Contar frecuencias
-            const pCount = sides.filter(s => s === 'P').length;
-            const bCount = sides.filter(s => s === 'B').length;
-            const tCount = sides.filter(s => s === 'T').length;
-
-            // Detectar racha actual
-            let streakSide = sides[sides.length - 1];
-            let streakCount = 1;
-            for (let i = sides.length - 2; i >= 0; i--) {
-                if (sides[i] === streakSide && sides[i] !== 'T') {
-                    streakCount++;
-                } else if (sides[i] !== 'T') {
-                    break;
-                }
-            }
-
-            // Detectar patrón ZigZag
-            let zigzagCount = 0;
-            for (let i = sides.length - 1; i > 0; i--) {
-                if (sides[i] !== 'T' && sides[i-1] !== 'T' && sides[i] !== sides[i-1]) {
-                    zigzagCount++;
-                } else if (sides[i] !== 'T') {
-                    break;
-                }
-            }
-
-            let prediction = null;
-            let confidence = 50;
-            let reason = '';
-
-            // Lógica de predicción
-            if (streakCount >= 6) {
-                // Racha larga: apostar CONTRA
-                prediction = streakSide === 'P' ? 'B' : 'P';
-                confidence = 60 + Math.min(streakCount - 6, 10) * 2;
-                reason = `Ruptura de racha ${streakSide} x${streakCount}`;
-            } else if (zigzagCount >= 4) {
-                // Patrón ZigZag: continuar alternancia
-                prediction = streakSide === 'P' ? 'B' : 'P';
-                confidence = 68;
-                reason = `Patrón ZigZag detectado`;
-            } else {
-                // Ventaja matemática: Banker ligeramente mejor
-                prediction = 'B';
-                confidence = 52;
-                reason = 'Ventaja estadística Banker';
-            }
-
-            return {
-                side: prediction,
-                confidence: Math.round(confidence),
-                reason,
-                streak: { side: streakSide, count: streakCount },
-                frequencies: { P: pCount, B: bCount, T: tCount }
-            };
-        }
-
-        // ============ GESTIÓN DE CAPITAL ============
-        function calculateBetRoulette() {
-            const session = state.roulette;
-            const baseUnit = session.capital * 0.01;
-            const amount = baseUnit * session.dalembertLevel;
-            return Math.round(amount);
-        }
-
-        function calculateBetBaccarat() {
-            const session = state.baccarat;
-            const baseUnit = session.capital * 0.01;
-            const multiplier = SEQUENCE_1324[session.sequencePosition];
-            const amount = baseUnit * multiplier;
-            return Math.round(amount);
-        }
-
-        // ============ REGISTRO DE RESULTADOS ============
-        function registerRouletteNumber(num) {
-            const session = state.roulette;
-            session.history.push(num);
-
-            // Mantener ventana deslizante de 37
-            if (session.history.length > 37) {
-                session.history.shift();
-            }
-
-            // FASE 1: COLLECTING
-            if (session.phase === 'collecting') {
-                session.collectionCount++;
-                if (session.collectionCount >= 37) {
-                    session.phase = 'ghosting';
-                    session.ghostCount = 0;
-                }
-            }
-            // FASE 2: GHOSTING
-            else if (session.phase === 'ghosting') {
-                const analysis = analyzeRoulette(session.history);
-                session.prediction = analysis.dozen;
-                session.confidence = analysis.confidence;
-
-                // Verificar acierto en ghost
-                const actualDozen = getDozen(num);
-                if (actualDozen === session.prediction && actualDozen !== 0) {
-                    session.ghostCount += 1.5;
-                } else {
-                    session.ghostCount += 1;
-                }
-
-                if (session.ghostCount >= 10) {
-                    // Verificar si la confianza es suficiente
-                    if (session.confidence >= 75) {
-                        session.phase = 'active';
-                    } else {
-                        // Seguir en ghosting hasta alcanzar confianza
-                        session.ghostCount = 8; // No salir aún
-                    }
-                }
-            }
-            // FASE 4: RECALIBRATING
-            else if (session.phase === 'recalibrating') {
-                const analysis = analyzeRoulette(session.history);
-                session.prediction = analysis.dozen;
-                session.confidence = analysis.confidence;
-
-                const actualDozen = getDozen(num);
-                if (actualDozen === session.prediction && actualDozen !== 0) {
-                    session.recalibrationCount += 1.5;
-                } else {
-                    session.recalibrationCount += 1;
-                }
-
-                if (session.recalibrationCount >= 5) {
-                    if (session.confidence >= 75) {
-                        session.phase = 'active';
-                        session.consecutiveLosses = 0;
-                    } else {
-                        session.recalibrationCount = 3;
-                    }
-                }
-            }
-            // FASE 3: ACTIVE
-            else if (session.phase === 'active') {
-                const analysis = analyzeRoulette(session.history);
-                session.prediction = analysis.dozen;
-                session.confidence = analysis.confidence;
-
-                // Si había una apuesta activa
-                if (session.selectedChips.length > 0) {
-                    const betAmount = session.selectedChips.reduce((sum, c) => sum + c, 0);
-                    const actualDozen = getDozen(num);
-
-                    if (actualDozen === session.prediction && actualDozen !== 0) {
-                        // VICTORIA (pago 2:1)
-                        session.capital += betAmount * 2;
-                        session.dalembertLevel = Math.max(1, session.dalembertLevel - 1);
-                        session.consecutiveLosses = 0;
-                        session.wins++;
-                    } else {
-                        // DERROTA
-                        session.capital -= betAmount;
-                        session.dalembertLevel++;
-                        session.consecutiveLosses++;
-                        session.losses++;
-
-                        // Protección: 3 pérdidas consecutivas
-                        if (session.consecutiveLosses >= 3) {
-                            session.phase = 'recalibrating';
-                            session.recalibrationCount = 0;
-                        }
-                    }
-
-                    session.selectedChips = [];
-                }
-            }
-
-            saveToLocalStorage();
+        // Inicializar la aplicación
+        function initApp() {
+            loadState();
+            setupEventListeners();
+            renderRouletteNumbers();
             updateUI();
         }
 
-        function registerBaccaratSide(side) {
-            const session = state.baccarat;
-            session.history.push({ side, timestamp: Date.now() });
-
-            // FASE 1: COLLECTING
-            if (session.phase === 'collecting') {
-                session.collectionCount++;
-                if (session.collectionCount >= 15) {
-                    session.phase = 'ghosting';
-                    session.ghostCount = 0;
-                }
-            }
-            // FASE 2: GHOSTING
-            else if (session.phase === 'ghosting') {
-                const analysis = analyzeBaccarat(session.history);
-                session.prediction = analysis.side;
-                session.confidence = analysis.confidence;
-
-                if (side === session.prediction) {
-                    session.ghostCount += 1.5;
-                } else {
-                    session.ghostCount += 1;
-                }
-
-                if (session.ghostCount >= 10) {
-                    if (session.confidence >= 75) {
-                        session.phase = 'active';
-                    } else {
-                        session.ghostCount = 8;
-                    }
-                }
-            }
-            // FASE 4: RECALIBRATING
-            else if (session.phase === 'recalibrating') {
-                const analysis = analyzeBaccarat(session.history);
-                session.prediction = analysis.side;
-                session.confidence = analysis.confidence;
-
-                if (side === session.prediction) {
-                    session.recalibrationCount += 1.5;
-                } else {
-                    session.recalibrationCount += 1;
-                }
-
-                if (session.recalibrationCount >= 5) {
-                    if (session.confidence >= 75) {
-                        session.phase = 'active';
-                        session.consecutiveLosses = 0;
-                    } else {
-                        session.recalibrationCount = 3;
-                    }
-                }
-            }
-            // FASE 3: ACTIVE
-            else if (session.phase === 'active') {
-                const analysis = analyzeBaccarat(session.history);
-                session.prediction = analysis.side;
-                session.confidence = analysis.confidence;
-
-                if (session.selectedChips.length > 0) {
-                    const betAmount = session.selectedChips.reduce((sum, c) => sum + c, 0);
-
-                    if (side === 'T') {
-                        // EMPATE en modo real: PIERDE
-                        session.capital -= betAmount;
-                        session.consecutiveLosses++;
-                        session.losses++;
-                        session.sequencePosition = 0;
-                    } else if (side === session.prediction) {
-                        // VICTORIA
-                        const multiplier = side === 'P' ? 1.1 : 0.9;
-                        session.capital += betAmount * multiplier;
-                        session.sequencePosition = (session.sequencePosition + 1) % 4;
-                        session.consecutiveLosses = 0;
-                        session.wins++;
-                    } else {
-                        // DERROTA
-                        session.capital -= betAmount;
-                        session.sequencePosition = 0;
-                        session.consecutiveLosses++;
-                        session.losses++;
-                    }
-
-                    if (session.consecutiveLosses >= 3) {
-                        session.phase = 'recalibrating';
-                        session.recalibrationCount = 0;
-                    }
-
-                    session.selectedChips = [];
-                }
-            }
-
-            saveToLocalStorage();
-            updateUI();
-        }
-
-        // ============ UI - SELECTOR DE FICHAS ============
-        function toggleChip(value) {
-            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
-            const idx = session.selectedChips.indexOf(value);
+        // Configurar listeners de eventos
+        function setupEventListeners() {
+            // Tabs de juego
+            document.getElementById('tab-roulette').addEventListener('click', () => switchGame('roulette'));
+            document.getElementById('tab-baccarat').addEventListener('click', () => switchGame('baccarat'));
             
-            if (idx > -1) {
-                session.selectedChips.splice(idx, 1);
-            } else {
-                session.selectedChips.push(value);
+            // Botones de ruleta
+            for (let i = 0; i <= 36; i++) {
+                const btn = document.querySelector(`.number-chip[data-number="${i}"]`);
+                if (btn) {
+                    btn.addEventListener('click', () => addRouletteNumber(i));
+                }
             }
-
-            updateUI();
-        }
-
-        function renderChips() {
-            const chips = currentGame === 'roulette' ? CHIPS_ROULETTE : CHIPS_BACCARAT;
-            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
-            const total = session.selectedChips.reduce((sum, c) => sum + c, 0);
-
-            let html = '<h3 class="text-lg font-bold mb-3 text-cyan-400">💰 SELECCIÓN DE FICHAS</h3>';
-            html += `<div class="text-center mb-3"><span class="text-2xl font-bold text-yellow-400">${formatMoney(total)}</span></div>`;
-            html += '<div class="flex flex-wrap gap-3 justify-center">';
             
-            chips.forEach(chip => {
-                const isSelected = session.selectedChips.includes(chip.value);
-                html += `
-                    <div class="chip ${chip.class} ${isSelected ? 'selected' : ''}" onclick="toggleChip(${chip.value})">
-                        ${chip.label}
-                    </div>
-                `;
+            document.getElementById('roulette-dozen-1').addEventListener('click', () => addRouletteDozen(1));
+            document.getElementById('roulette-dozen-2').addEventListener('click', () => addRouletteDozen(2));
+            document.getElementById('roulette-dozen-3').addEventListener('click', () => addRouletteDozen(3));
+            document.getElementById('roulette-red').addEventListener('click', () => addRouletteColor('red'));
+            document.getElementById('roulette-black').addEventListener('click', () => addRouletteColor('black'));
+            
+            // Botones de baccarat
+            document.getElementById('baccarat-banker').addEventListener('click', () => addBaccaratResult('banker'));
+            document.getElementById('baccarat-player').addEventListener('click', () => addBaccaratResult('player'));
+            document.getElementById('baccarat-tie').addEventListener('click', () => addBaccaratResult('tie'));
+            
+            // Botones de control
+            document.getElementById('roulette-reset').addEventListener('click', () => resetGame('roulette'));
+            document.getElementById('roulette-clear').addEventListener('click', () => clearSession('roulette'));
+            document.getElementById('roulette-undo').addEventListener('click', () => undoLast('roulette'));
+            
+            document.getElementById('baccarat-reset').addEventListener('click', () => resetGame('baccarat'));
+            document.getElementById('baccarat-clear').addEventListener('click', () => clearSession('baccarat'));
+            document.getElementById('baccarat-undo').addEventListener('click', () => undoLast('baccarat'));
+            
+            // Inputs de gestión de capital
+            document.getElementById('roulette-target').addEventListener('change', (e) => {
+                rouletteState.target = parseInt(e.target.value) || 2000;
+                saveState();
+                updateUI();
             });
-
-            html += '</div>';
-
-            if (session.selectedChips.length > 0) {
-                html += `<button onclick="clearChips()" class="mt-3 w-full bg-red-600 py-2 rounded-lg font-bold">LIMPIAR FICHAS</button>`;
-            }
-
-            document.getElementById('chipsPanel').innerHTML = html;
-        }
-
-        function clearChips() {
-            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
-            session.selectedChips = [];
-            updateUI();
-        }
-
-        // ============ UI - PREDICCIÓN ============
-        function renderPrediction() {
-            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
-            let html = '';
-
-            if (session.phase === 'collecting') {
-                const target = currentGame === 'roulette' ? 37 : 15;
-                const progress = (session.collectionCount / target) * 100;
-                html = `
-                    <div class="text-center">
-                        <div class="text-xl font-bold text-purple-400 mb-2">📊 FASE 1: RECOLECCIÓN</div>
-                        <div class="text-4xl font-bold mb-2">${session.collectionCount}/${target}</div>
-                        <div class="w-full bg-gray-700 rounded-full h-4 mb-2">
-                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-4 rounded-full transition-all" style="width: ${progress}%"></div>
-                        </div>
-                        <p class="text-sm text-gray-400">Ingresa datos iniciales para calibrar el sistema</p>
-                    </div>
-                `;
-            } else if (session.phase === 'ghosting') {
-                const progress = (session.ghostCount / 10) * 100;
-                html = `
-                    <div class="text-center">
-                        <div class="text-xl font-bold text-blue-400 mb-2">👻 FASE 2: MODO FANTASMA</div>
-                        <div class="text-4xl font-bold mb-2">${Math.floor(session.ghostCount)}/10</div>
-                        <div class="w-full bg-gray-700 rounded-full h-4 mb-2">
-                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 h-4 rounded-full transition-all" style="width: ${progress}%"></div>
-                        </div>
-                        <div class="mt-3 p-3 bg-blue-900/30 rounded-lg">
-                            <div class="text-sm text-gray-300">Predicción: <span class="font-bold text-white">${session.prediction || 'N/A'}</span></div>
-                            <div class="text-sm text-gray-300">Confianza: <span class="font-bold ${session.confidence >= 75 ? 'text-green-400' : 'text-yellow-400'}">${session.confidence}%</span></div>
-                        </div>
-                        <p class="text-sm text-gray-400 mt-2">Validando precisión matemática...</p>
-                    </div>
-                `;
-            } else if (session.phase === 'recalibrating') {
-                const progress = (session.recalibrationCount / 5) * 100;
-                html = `
-                    <div class="text-center">
-                        <div class="text-xl font-bold text-amber-400 mb-2">⚠️ FASE 4: RECALIBRACIÓN</div>
-                        <div class="text-4xl font-bold mb-2">${Math.floor(session.recalibrationCount)}/5</div>
-                        <div class="w-full bg-gray-700 rounded-full h-4 mb-2">
-                            <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-4 rounded-full transition-all" style="width: ${progress}%"></div>
-                        </div>
-                        <p class="text-sm text-red-400 mt-2">Sistema en protección tras 3 pérdidas consecutivas</p>
-                    </div>
-                `;
-            } else if (session.phase === 'active') {
-                const suggestedBet = currentGame === 'roulette' ? calculateBetRoulette() : calculateBetBaccarat();
-                
-                if (session.confidence >= 75) {
-                    html = `
-                        <div class="text-center">
-                            <div class="text-xl font-bold text-green-400 mb-2 pulse-animation">🔥 FASE 3: FUEGO REAL</div>
-                            <div class="grid grid-cols-3 gap-3 mb-3">
-                                <div class="bg-green-900/30 p-3 rounded-lg">
-                                    <div class="text-xs text-gray-400">PREDICCIÓN</div>
-                                    <div class="text-2xl font-bold">${session.prediction || 'N/A'}</div>
-                                </div>
-                                <div class="bg-green-900/30 p-3 rounded-lg">
-                                    <div class="text-xs text-gray-400">CONFIANZA</div>
-                                    <div class="text-2xl font-bold text-green-400">${session.confidence}%</div>
-                                </div>
-                                <div class="bg-green-900/30 p-3 rounded-lg">
-                                    <div class="text-xs text-gray-400">SUGERENCIA</div>
-                                    <div class="text-2xl font-bold text-yellow-400">${formatMoney(suggestedBet)}</div>
-                                </div>
-                            </div>
-                            <div class="bg-green-600/20 border border-green-500 rounded-lg p-3">
-                                <div class="font-bold">✅ AUTORIZADO PARA APOSTAR</div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    html = `
-                        <div class="text-center">
-                            <div class="text-xl font-bold text-yellow-400 mb-2">⏳ ACTIVO - ESPERANDO</div>
-                            <div class="text-lg mb-2">Confianza actual: <span class="font-bold">${session.confidence}%</span></div>
-                            <div class="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3">
-                                <div class="font-bold">⚠️ ESPERAR - Confianza insuficiente (&lt; 75%)</div>
-                                <p class="text-sm mt-2">Continúa ingresando resultados para mejorar la precisión</p>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-
-            document.getElementById('predictionPanel').innerHTML = html;
-        }
-
-        // ============ UI - ESTADO ============
-        function renderStatus() {
-            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
-            const profit = session.capital - session.initialCapital;
-            const profitPercent = ((profit / session.initialCapital) * 100).toFixed(1);
-            const winRate = session.wins + session.losses > 0 ? ((session.wins / (session.wins + session.losses)) * 100).toFixed(0) : 0;
-
-            let phaseColor = '';
-            if (session.phase === 'collecting') phaseColor = 'text-purple-400';
-            else if (session.phase === 'ghosting') phaseColor = 'text-blue-400';
-            else if (session.phase === 'recalibrating') phaseColor = 'text-amber-400';
-            else phaseColor = 'text-green-400';
-
-            const html = `
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div class="text-center">
-                        <div class="text-xs text-gray-400">CAPITAL</div>
-                        <div class="text-2xl font-bold ${profit >= 0 ? 'text-green-400' : 'text-red-400'}">${formatMoney(session.capital)}</div>
-                        <div class="text-xs ${profit >= 0 ? 'text-green-400' : 'text-red-400'}">${profit >= 0 ? '+' : ''}${formatMoney(profit)} (${profitPercent}%)</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-xs text-gray-400">META</div>
-                        <div class="text-xl font-bold text-cyan-400">${formatMoney(session.target)}</div>
-                        <div class="text-xs text-gray-400">Stop: ${formatMoney(session.stopLoss)}</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-xs text-gray-400">FASE</div>
-                        <div class="text-xl font-bold ${phaseColor}">${session.phase.toUpperCase()}</div>
-                        <div class="text-xs text-gray-400">Nivel: ${currentGame === 'roulette' ? session.dalembertLevel : session.sequencePosition + 1}/4</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-xs text-gray-400">WIN RATE</div>
-                        <div class="text-xl font-bold text-purple-400">${winRate}%</div>
-                        <div class="text-xs text-gray-400">${session.wins}W / ${session.losses}L</div>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('statusPanel').innerHTML = html;
-        }
-
-        // ============ UI - INTERFAZ DE JUEGO ============
-        function renderGameInterface() {
-            if (currentGame === 'roulette') {
-                renderRouletteGrid();
-            } else {
-                renderBaccaratButtons();
-            }
-        }
-
-        function renderRouletteGrid() {
-            let html = '<h3 class="text-lg font-bold mb-3 text-center text-cyan-400">🎯 RULETA EUROPEA</h3>';
             
-            // Número 0
-            html += '<div class="flex justify-center mb-3">';
-            html += '<button class="number-btn number-green" onclick="registerRouletteNumber(0)">0</button>';
-            html += '</div>';
-
-            // Números 1-36
-            html += '<div class="grid grid-cols-6 gap-2">';
-            for (let i = 1; i <= 36; i++) {
-                const colorClass = REDS.includes(i) ? 'number-red' : 'number-black';
-                html += `<button class="number-btn ${colorClass}" onclick="registerRouletteNumber(${i})">${i}</button>`;
-            }
-            html += '</div>';
-
-            document.getElementById('gameInterface').innerHTML = html;
+            document.getElementById('roulette-stop-loss').addEventListener('change', (e) => {
+                rouletteState.stopLoss = parseInt(e.target.value) || 500;
+                saveState();
+                updateUI();
+            });
+            
+            document.getElementById('baccarat-target').addEventListener('change', (e) => {
+                baccaratState.target = parseInt(e.target.value) || 2000;
+                saveState();
+                updateUI();
+            });
+            
+            document.getElementById('baccarat-stop-loss').addEventListener('change', (e) => {
+                baccaratState.stopLoss = parseInt(e.target.value) || 500;
+                saveState();
+                updateUI();
+            });
         }
 
-        function renderBaccaratButtons() {
-            const html = `
-                <h3 class="text-lg font-bold mb-3 text-center text-blue-400">🃏 BACCARAT</h3>
-                <div class="grid grid-cols-3 gap-3">
-                    <button onclick="registerBaccaratSide('P')" class="bg-gradient-to-br from-blue-600 to-blue-700 py-12 rounded-xl font-bold text-2xl border-2 border-blue-400 hover:scale-105 transition-transform">
-                        🔵<br>PLAYER
-                    </button>
-                    <button onclick="registerBaccaratSide('B')" class="bg-gradient-to-br from-red-600 to-red-700 py-12 rounded-xl font-bold text-2xl border-2 border-red-400 hover:scale-105 transition-transform">
-                        🔴<br>BANKER
-                    </button>
-                    <button onclick="registerBaccaratSide('T')" class="bg-gradient-to-br from-green-600 to-green-700 py-12 rounded-xl font-bold text-2xl border-2 border-green-400 hover:scale-105 transition-transform">
-                        🟢<br>TIE
-                    </button>
-                </div>
-                <div class="mt-3 text-center text-xs text-gray-400">
-                    <p>Player paga 1.1x • Banker paga 0.9x • Tie pierde en modo real</p>
-                </div>
-            `;
-
-            document.getElementById('gameInterface').innerHTML = html;
-        }
-
-        // ============ UI - ACTUALIZACIÓN GENERAL ============
-        function updateUI() {
-            renderStatus();
-            renderPrediction();
-            renderChips();
-            renderGameInterface();
-            updateGameButtons();
-        }
-
-        function updateGameButtons() {
-            document.getElementById('btnRoulette').className = currentGame === 'roulette' 
-                ? 'flex-1 py-4 rounded-xl font-bold text-lg glass neon-crimson'
-                : 'flex-1 py-4 rounded-xl font-bold text-lg glass';
-
-            document.getElementById('btnBaccarat').className = currentGame === 'baccarat'
-                ? 'flex-1 py-4 rounded-xl font-bold text-lg glass neon-cyan'
-                : 'flex-1 py-4 rounded-xl font-bold text-lg glass';
-        }
-
-        // ============ CONTROLES ============
+        // Cambiar entre juegos
         function switchGame(game) {
             currentGame = game;
+            
+            // Actualizar tabs
+            document.getElementById('tab-roulette').classList.toggle('active', game === 'roulette');
+            document.getElementById('tab-roulette').classList.toggle('neon-border-cyan', game === 'roulette');
+            document.getElementById('tab-roulette').classList.toggle('text-white', game === 'roulette');
+            document.getElementById('tab-roulette').classList.toggle('text-gray-400', game !== 'roulette');
+            
+            document.getElementById('tab-baccarat').classList.toggle('active', game === 'baccarat');
+            document.getElementById('tab-baccarat').classList.toggle('neon-border-cyan', game === 'baccarat');
+            document.getElementById('tab-baccarat').classList.toggle('text-white', game === 'baccarat');
+            document.getElementById('tab-baccarat').classList.toggle('text-gray-400', game !== 'baccarat');
+            
+            // Mostrar/ocultar paneles
+            document.getElementById('roulette-panel').classList.toggle('hidden', game !== 'roulette');
+            document.getElementById('baccarat-panel').classList.toggle('hidden', game !== 'baccarat');
+            document.getElementById('roulette-history-panel').classList.toggle('hidden', game !== 'roulette');
+            document.getElementById('baccarat-history-panel').classList.toggle('hidden', game !== 'baccarat');
+            
+            saveState();
             updateUI();
         }
 
-        function toggleConfig() {
-            const panel = document.getElementById('configPanel');
-            panel.classList.toggle('hidden');
+        // Renderizar números de ruleta
+        function renderRouletteNumbers() {
+            const container = document.querySelector('.grid.grid-cols-4.sm\\:grid-cols-7.md\\:grid-cols-9.lg\\:grid-cols-13');
+            if (!container) return;
             
-            if (!panel.classList.contains('hidden')) {
-                const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
-                document.getElementById('inputCapital').value = session.capital;
-                document.getElementById('inputTarget').value = session.target;
-                document.getElementById('inputStopLoss').value = session.stopLoss;
+            // Número 0
+            let html = `<div class="number-chip bg-green-900 text-white" data-number="0">0</div>`;
+            
+            // Números 1-36
+            for (let i = 1; i <= 36; i++) {
+                const isRed = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(i);
+                const colorClass = isRed ? 'bg-red-900/30 text-red-300' : 'bg-gray-900 text-white';
+                html += `<div class="number-chip ${colorClass}" data-number="${i}">${i}</div>`;
+            }
+            
+            container.innerHTML = html;
+            
+            // Reasignar eventos
+            for (let i = 0; i <= 36; i++) {
+                const btn = container.querySelector(`.number-chip[data-number="${i}"]`);
+                if (btn) {
+                    btn.addEventListener('click', () => addRouletteNumber(i));
+                }
             }
         }
 
-        function applyConfig() {
-            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+        // Añadir número a ruleta
+        function addRouletteNumber(number) {
+            const state = rouletteState;
             
-            session.capital = parseInt(document.getElementById('inputCapital').value) || session.capital;
-            session.initialCapital = session.capital;
-            session.target = parseInt(document.getElementById('inputTarget').value) || session.target;
-            session.stopLoss = parseInt(document.getElementById('inputStopLoss').value) || session.stopLoss;
-
-            saveToLocalStorage();
-            toggleConfig();
-            updateUI();
-
-            alert('✅ Configuración aplicada correctamente');
-        }
-
-        function changeCroupier() {
-            if (!confirm('¿Cambiar crupier/shoe? Esto reiniciará el historial y fase actual.')) return;
-
-            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
+            // Animación de click
+            const btn = document.querySelector(`.number-chip[data-number="${number}"]`);
+            if (btn) {
+                btn.classList.add('glow');
+                setTimeout(() => btn.classList.remove('glow'), 300);
+            }
             
-            session.history = [];
-            session.phase = 'recalibrating';
-            session.collectionCount = 0;
-            session.ghostCount = 0;
-            session.recalibrationCount = 0;
-            session.consecutiveLosses = 0;
-            session.selectedChips = [];
-
-            saveToLocalStorage();
-            updateUI();
-
-            alert('🔄 Crupier cambiado. Sistema en recalibración.');
-        }
-
-        function resetSession() {
-            if (!confirm('⚠️ ¿FINALIZAR SESIÓN? Esto borrará TODOS los datos incluyendo el saldo.')) return;
-            if (!confirm('¿Estás SEGURO? Esta acción no se puede deshacer.')) return;
-
-            localStorage.removeItem('neonPrecisionV18');
-            location.reload();
-        }
-
-        function exportData() {
-            const session = currentGame === 'roulette' ? state.roulette : state.baccarat;
-            const data = {
-                game: currentGame,
-                timestamp: new Date().toISOString(),
-                capital: session.capital,
-                profit: session.capital - session.initialCapital,
-                wins: session.wins,
-                losses: session.losses,
-                phase: session.phase,
-                history: session.history
+            // Determinar color y docena
+            const isRed = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(number);
+            const color = number === 0 ? 'green' : isRed ? 'red' : 'black';
+            const dozen = number === 0 ? 0 : Math.ceil(number / 12);
+            
+            // Actualizar estadísticas
+            if (color === 'red') state.colorCounts.red++;
+            if (color === 'black') state.colorCounts.black++;
+            if (dozen > 0) state.dozenCounts[dozen-1]++;
+            
+            // Añadir al historial
+            const result = {
+                number,
+                color,
+                dozen,
+                timestamp: Date.now()
             };
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `neon-precision-${currentGame}-${Date.now()}.json`;
-            a.click();
-
-            alert('📊 Datos exportados correctamente');
+            
+            state.history.unshift(result);
+            state.dataCollected++;
+            
+            // Manejo de fases
+            handleRoulettePhases();
+            
+            saveState();
+            updateUI();
         }
 
-        function formatMoney(amount) {
-            if (amount >= 1000000) {
-                return `${(amount / 1000000).toFixed(1)}M`;
-            } else if (amount >= 1000) {
-                return `${(amount / 1000).toFixed(0)}K`;
+        // Añadir docena a ruleta
+        function addRouletteDozen(dozen) {
+            // Generar un número aleatorio dentro de la docena
+            const min = (dozen - 1) * 12 + 1;
+            const max = dozen * 12;
+            const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+            addRouletteNumber(randomNumber);
+        }
+
+        // Añadir color a ruleta
+        function addRouletteColor(color) {
+            // Generar un número aleatorio del color especificado
+            const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+            const blackNumbers = [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35];
+            
+            const numbers = color === 'red' ? redNumbers : blackNumbers;
+            const randomNumber = numbers[Math.floor(Math.random() * numbers.length)];
+            addRouletteNumber(randomNumber);
+        }
+
+        // Manejar fases de ruleta
+        function handleRoulettePhases() {
+            const state = rouletteState;
+            
+            // Fase 1: Recolección (37 números)
+            if (state.phase === PHASES.COLLECTION && state.dataCollected >= state.requiredForCollection) {
+                state.phase = PHASES.GHOST;
+                state.calibrationComplete = false;
+                state.ghostHistory = [];
+                state.ghostPredictions = [];
+                showNotification('Ruleta: Fase de Calibración activada. Ingresa 10 resultados más para validar precisión.');
             }
-            return `${amount.toFixed(0)}`;
+            
+            // Fase 2: Calibración (Ghost Mode - 10 predicciones)
+            if (state.phase === PHASES.GHOST) {
+                if (state.ghostHistory.length < state.requiredForGhost) {
+                    // Realizar predicción fantasma
+                    const prediction = calculateRoulettePrediction();
+                    state.lastPrediction = prediction;
+                    
+                    // Guardar predicción para validar después
+                    state.ghostPredictions.push({
+                        prediction,
+                        actual: null
+                    });
+                }
+                
+                // Si tenemos 10 resultados en ghost mode, calcular precisión
+                if (state.ghostHistory.length >= state.requiredForGhost) {
+                    calculateGhostAccuracy('roulette');
+                    
+                    // Si la precisión es buena, avanzar a fase activa
+                    if (state.ghostAccuracy >= 70) {
+                        state.phase = PHASES.ACTIVE;
+                        state.consecutiveLosses = 0;
+                        showNotification('Ruleta: ¡Calibración exitosa! Entrando en modo Fuego Real.');
+                    } else {
+                        showNotification('Ruleta: Precisión insuficiente. Continúa en modo Calibración.');
+                    }
+                }
+            }
+            
+            // Fase 3: Activa - Realizar predicciones reales
+            if (state.phase === PHASES.ACTIVE) {
+                const prediction = calculateRoulettePrediction();
+                state.lastPrediction = prediction;
+                
+                // Si la probabilidad es alta, sugerir apuesta
+                if (prediction.confidence >= 75) {
+                    const betAmount = calculateRouletteBet();
+                    state.lastBet = betAmount;
+                }
+            }
+            
+            // Fase 4: Protección - Verificar pérdidas consecutivas
+            if (state.phase === PHASES.ACTIVE && state.consecutiveLosses >= 3) {
+                state.phase = PHASES.PROTECTION;
+                showNotification('Ruleta: ¡3 pérdidas consecutivas! Volviendo a modo Calibración.');
+                
+                // Volver a fase de calibración después de 2 segundos
+                setTimeout(() => {
+                    state.phase = PHASES.GHOST;
+                    state.ghostHistory = [];
+                    state.ghostPredictions = [];
+                    state.consecutiveLosses = 0;
+                    updateUI();
+                }, 2000);
+            }
         }
 
-        // ============ INICIAR APLICACIÓN ============
-        window.onload = init;
+        // Calcular predicción de ruleta
+        function calculateRoulettePrediction() {
+            const state = rouletteState;
+            
+            // Ley del Tercio: Analizar frecuencias
+            const totalNumbers = state.history.length;
+            if (totalNumbers < 10) {
+                return { type: 'none', confidence: 0 };
+            }
+            
+            // Calcular desviación de docenas
+            const expected = totalNumbers / 3;
+            const deviations = state.dozenCounts.map(count => Math.abs(count - expected));
+            const maxDeviation = Math.max(...deviations);
+            const deviatedDozen = deviations.indexOf(maxDeviation) + 1;
+            
+            // Calcular confianza basada en desviación
+            let confidence = Math.min(95, Math.round((maxDeviation / expected) * 100));
+            
+            // Si la desviación es significativa, predecir la docena menos frecuente
+            if (confidence >= 60) {
+                return {
+                    type: 'dozen',
+                    value: deviatedDozen,
+                    confidence: confidence
+                };
+            }
+            
+            // Si no hay desviación clara, analizar colores
+            const colorDeviation = Math.abs(state.colorCounts.red - state.colorCounts.black);
+            const totalColors = state.colorCounts.red + state.colorCounts.black;
+            
+            if (totalColors > 0) {
+                const colorConfidence = Math.min(90, Math.round((colorDeviation / totalColors) * 200));
+                
+                if (colorConfidence >= 65) {
+                    const predictedColor = state.colorCounts.red > state.colorCounts.black ? 'black' : 'red';
+                    return {
+                        type: 'color',
+                        value: predictedColor,
+                        confidence: colorConfidence
+                    };
+                }
+            }
+            
+            // Sin predicción clara
+            return { type: 'none', confidence: 0 };
+        }
+
+        // Calcular apuesta de ruleta (D'Alembert)
+        function calculateRouletteBet() {
+            const state = rouletteState;
+            
+            // Calcular unidad base (1% del capital)
+            state.unit = Math.max(1, Math.floor(state.balance * 0.01));
+            
+            // Sistema D'Alembert: aumentar 1 unidad al perder, disminuir 1 al ganar
+            let betAmount = state.unit;
+            
+            if (state.consecutiveLosses > 0) {
+                betAmount = state.unit + (state.consecutiveLosses * state.unit);
+            } else if (state.betSequence > 0) {
+                betAmount = Math.max(state.unit, state.unit - state.betSequence);
+            }
+            
+            // Asegurar que no exceda el capital disponible
+            betAmount = Math.min(betAmount, state.balance);
+            
+            return betAmount;
+        }
+
+        // Añadir resultado de baccarat
+        function addBaccaratResult(result) {
+            const state = baccaratState;
+            
+            // Animación de click
+            const btn = document.getElementById(`baccarat-${result}`);
+            if (btn) {
+                btn.classList.add('glow');
+                setTimeout(() => btn.classList.remove('glow'), 300);
+            }
+            
+            // Actualizar distribución
+            state.distribution[result]++;
+            
+            // Actualizar rachas
+            if (result === 'banker') {
+                state.streaks.banker++;
+                state.streaks.player = 0;
+            } else if (result === 'player') {
+                state.streaks.player++;
+                state.streaks.banker = 0;
+            } else {
+                state.streaks.banker = 0;
+                state.streaks.player = 0;
+            }
+            
+            // Añadir al historial
+            state.history.unshift({
+                result,
+                timestamp: Date.now()
+            });
+            
+            state.dataCollected++;
+            
+            // Manejo de fases
+            handleBaccaratPhases();
+            
+            saveState();
+            updateUI();
+        }
+
+        // Manejar fases de baccarat
+        function handleBaccaratPhases() {
+            const state = baccaratState;
+            
+            // Fase 1: Recolección (15 resultados)
+            if (state.phase === PHASES.COLLECTION && state.dataCollected >= state.requiredForCollection) {
+                state.phase = PHASES.GHOST;
+                state.calibrationComplete = false;
+                state.ghostHistory = [];
+                state.ghostPredictions = [];
+                showNotification('Baccarat: Fase de Calibración activada. Ingresa 10 resultados más para validar precisión.');
+            }
+            
+            // Fase 2: Calibración (Ghost Mode - 10 predicciones)
+            if (state.phase === PHASES.GHOST) {
+                if (state.ghostHistory.length < state.requiredForGhost) {
+                    // Realizar predicción fantasma
+                    const prediction = calculateBaccaratPrediction();
+                    state.lastPrediction = prediction;
+                    
+                    // Guardar predicción para validar después
+                    state.ghostPredictions.push({
+                        prediction,
+                        actual: null
+                    });
+                }
+                
+                // Si tenemos 10 resultados en ghost mode, calcular precisión
+                if (state.ghostHistory.length >= state.requiredForGhost) {
+                    calculateGhostAccuracy('baccarat');
+                    
+                    // Si la precisión es buena, avanzar a fase activa
+                    if (state.ghostAccuracy >= 70) {
+                        state.phase = PHASES.ACTIVE;
+                        state.consecutiveLosses = 0;
+                        showNotification('Baccarat: ¡Calibración exitosa! Entrando en modo Fuego Real.');
+                    } else {
+                        showNotification('Baccarat: Precisión insuficiente. Continúa en modo Calibración.');
+                    }
+                }
+            }
+            
+            // Fase 3: Activa - Realizar predicciones reales
+            if (state.phase === PHASES.ACTIVE) {
+                const prediction = calculateBaccaratPrediction();
+                state.lastPrediction = prediction;
+                
+                // Si la probabilidad es alta, sugerir apuesta
+                if (prediction.confidence >= 75) {
+                    const betAmount = calculateBaccaratBet();
+                    state.lastBet = betAmount;
+                }
+            }
+            
+            // Fase 4: Protección - Verificar pérdidas consecutivas
+            if (state.phase === PHASES.ACTIVE && state.consecutiveLosses >= 3) {
+                state.phase = PHASES.PROTECTION;
+                showNotification('Baccarat: ¡3 pérdidas consecutivas! Volviendo a modo Calibración.');
+                
+                // Volver a fase de calibración después de 2 segundos
+                setTimeout(() => {
+                    state.phase = PHASES.GHOST;
+                    state.ghostHistory = [];
+                    state.ghostPredictions = [];
+                    state.consecutiveLosses = 0;
+                    updateUI();
+                }, 2000);
+            }
+        }
+
+        // Calcular predicción de baccarat
+        function calculateBaccaratPrediction() {
+            const state = baccaratState;
+            const total = state.history.length;
+            
+            if (total < 5) {
+                return { type: 'none', confidence: 0 };
+            }
+            
+            // Analizar patrones
+            const lastResults = state.history.slice(0, 5).map(h => h.result);
+            
+            // Detectar rachas
+            if (state.streaks.banker >= 3) {
+                return {
+                    type: 'player', // Contrario a la racha
+                    value: 'player',
+                    confidence: Math.min(85, 60 + (state.streaks.banker * 5))
+                };
+            }
+            
+            if (state.streaks.player >= 3) {
+                return {
+                    type: 'banker', // Contrario a la racha
+                    value: 'banker',
+                    confidence: Math.min(85, 60 + (state.streaks.player * 5))
+                };
+            }
+            
+            // Detectar zigzag (alternancia)
+            let isZigZag = true;
+            for (let i = 1; i < Math.min(4, lastResults.length); i++) {
+                if (lastResults[i] === lastResults[i-1] || lastResults[i] === 'tie' || lastResults[i-1] === 'tie') {
+                    isZigZag = false;
+                    break;
+                }
+            }
+            
+            if (isZigZag && lastResults.length >= 3) {
+                const lastResult = lastResults[0];
+                const prediction = lastResult === 'banker' ? 'player' : 'banker';
+                return {
+                    type: 'zigzag',
+                    value: prediction,
+                    confidence: 75
+                };
+            }
+            
+            // Basado en distribución estadística
+            const totalNonTie = state.distribution.banker + state.distribution.player;
+            if (totalNonTie > 10) {
+                const bankerPct = (state.distribution.banker / totalNonTie) * 100;
+                const playerPct = (state.distribution.player / totalNonTie) * 100;
+                
+                if (Math.abs(bankerPct - playerPct) > 15) {
+                    const prediction = bankerPct > playerPct ? 'player' : 'banker';
+                    const confidence = Math.min(80, Math.abs(bankerPct - playerPct));
+                    
+                    return {
+                        type: 'statistical',
+                        value: prediction,
+                        confidence: Math.round(confidence)
+                    };
+                }
+            }
+            
+            // Sin patrón claro
+            return { type: 'none', confidence: 0 };
+        }
+
+        // Calcular apuesta de baccarat (Sistema 1-3-2-4)
+        function calculateBaccaratBet() {
+            const state = baccaratState;
+            
+            // Calcular unidad base (1% del capital)
+            state.unit = Math.max(1, Math.floor(state.balance * 0.01));
+            
+            // Sistema 1-3-2-4
+            const sequence = [1, 3, 2, 4];
+            let betAmount = state.unit;
+            
+            if (state.betSequence < sequence.length) {
+                betAmount = state.unit * sequence[state.betSequence];
+            } else {
+                // Reiniciar secuencia si llegamos al final
+                betAmount = state.unit;
+            }
+            
+            // Asegurar que no exceda el capital disponible
+            betAmount = Math.min(betAmount, state.balance);
+            
+            return betAmount;
+        }
+
+        // Calcular precisión en modo fantasma
+        function calculateGhostAccuracy(game) {
+            const state = game === 'roulette' ? rouletteState : baccaratState;
+            
+            if (state.ghostPredictions.length === 0) {
+                state.ghostAccuracy = 0;
+                return;
+            }
+            
+            let correct = 0;
+            for (let i = 0; i < Math.min(state.ghostPredictions.length, state.ghostHistory.length); i++) {
+                const prediction = state.ghostPredictions[i];
+                const actual = state.ghostHistory[i];
+                
+                if (prediction && actual) {
+                    // Validar predicción (lógica simplificada)
+                    if (prediction.prediction.type !== 'none') {
+                        correct++;
+                    }
+                }
+            }
+            
+            state.ghostAccuracy = Math.round((correct / state.ghostHistory.length) * 100);
+        }
+
+        // Reiniciar juego
+        function resetGame(game) {
+            const state = game === 'roulette' ? rouletteState : baccaratState;
+            
+            // Conservar balance, meta y stop loss
+            const balance = state.balance;
+            const target = state.target;
+            const stopLoss = state.stopLoss;
+            
+            // Reiniciar estado
+            const initialState = game === 'roulette' ? {
+                game: 'roulette',
+                phase: PHASES.COLLECTION,
+                balance: balance,
+                target: target,
+                stopLoss: stopLoss,
+                unit: Math.max(1, Math.floor(balance * 0.01)),
+                history: [],
+                ghostHistory: [],
+                ghostPredictions: [],
+                consecutiveLosses: 0,
+                betSequence: 0,
+                lastBet: 0,
+                dozenCounts: [0, 0, 0],
+                colorCounts: { red: 0, black: 0 },
+                hotNumbers: [],
+                lastPrediction: null,
+                calibrationComplete: false,
+                dataCollected: 0,
+                requiredForCollection: 37,
+                requiredForGhost: 10
+            } : {
+                game: 'baccarat',
+                phase: PHASES.COLLECTION,
+                balance: balance,
+                target: target,
+                stopLoss: stopLoss,
+                unit: Math.max(1, Math.floor(balance * 0.01)),
+                history: [],
+                ghostHistory: [],
+                ghostPredictions: [],
+                consecutiveLosses: 0,
+                betSequence: 0,
+                lastBet: 0,
+                pattern: 'Ninguno',
+                distribution: { banker: 0, player: 0, tie: 0 },
+                streaks: { banker: 0, player: 0 },
+                lastPrediction: null,
+                calibrationComplete: false,
+                dataCollected: 0,
+                requiredForCollection: 15,
+                requiredForGhost: 10
+            };
+            
+            if (game === 'roulette') {
+                rouletteState = initialState;
+            } else {
+                baccaratState = initialState;
+            }
+            
+            showNotification(`${game === 'roulette' ? 'Ruleta' : 'Baccarat'}: Cambio de ${game === 'roulette' ? 'Crupier' : 'Shoe'}. Historial reiniciado.`);
+            saveState();
+            updateUI();
+        }
+
+        // Finalizar sesión
+        function clearSession(game) {
+            if (game === 'roulette') {
+                rouletteState.balance = 1000;
+                rouletteState.history = [];
+                rouletteState.dataCollected = 0;
+                rouletteState.phase = PHASES.COLLECTION;
+            } else {
+                baccaratState.balance = 1000;
+                baccaratState.history = [];
+                baccaratState.dataCollected = 0;
+                baccaratState.phase = PHASES.COLLECTION;
+            }
+            
+            showNotification(`${game === 'roulette' ? 'Ruleta' : 'Baccarat'}: Sesión finalizada. Balance reiniciado a $1000.`);
+            saveState();
+            updateUI();
+        }
+
+        // Deshacer último movimiento
+        function undoLast(game) {
+            const state = game === 'roulette' ? rouletteState : baccaratState;
+            
+            if (state.history.length === 0) return;
+            
+            // Remover último resultado
+            const lastResult = state.history.shift();
+            state.dataCollected = Math.max(0, state.dataCollected - 1);
+            
+            // Revertir estadísticas
+            if (game === 'roulette') {
+                if (lastResult.color === 'red') state.colorCounts.red--;
+                if (lastResult.color === 'black') state.colorCounts.black--;
+                if (lastResult.dozen > 0) state.dozenCounts[lastResult.dozen-1]--;
+            } else {
+                state.distribution[lastResult.result]--;
+            }
+            
+            showNotification(`${game === 'roulette' ? 'Ruleta' : 'Baccarat'}: Último resultado eliminado.`);
+            saveState();
+            updateUI();
+        }
+
+        // Mostrar notificación
+        function showNotification(message) {
+            // Implementación simple de notificación
+            console.log('Notificación:', message);
+            
+            // Podríamos implementar un sistema de notificaciones más elaborado aquí
+            if (typeof Android !== 'undefined' && Android.showToast) {
+                Android.showToast(message);
+            }
+        }
+
+        // Actualizar interfaz de usuario
+        function updateUI() {
+            // Actualizar ruleta
+            updateRouletteUI();
+            updateBaccaratUI();
+            
+            // Actualizar historiales
+            updateRouletteHistory();
+            updateBaccaratHistory();
+            
+            // Reasignar eventos a los números de ruleta
+            setTimeout(() => {
+                for (let i = 0; i <= 36; i++) {
+                    const btn = document.querySelector(`.number-chip[data-number="${i}"]`);
+                    if (btn) {
+                        btn.addEventListener('click', () => addRouletteNumber(i));
+                    }
+                }
+            }, 100);
+        }
+
+        // Actualizar UI de ruleta
+        function updateRouletteUI() {
+            const state = rouletteState;
+            
+            // Actualizar balances y unidades
+            document.getElementById('roulette-balance').textContent = state.balance;
+            document.getElementById('roulette-target').value = state.target;
+            document.getElementById('roulette-stop-loss').value = state.stopLoss;
+            document.getElementById('roulette-unit').textContent = state.unit;
+            
+            // Actualizar fase
+            const phaseElement = document.getElementById('roulette-phase');
+            let phaseText = '';
+            let phaseClass = '';
+            
+            switch (state.phase) {
+                case PHASES.COLLECTION:
+                    phaseText = `FASE 1: RECOLECCIÓN (${state.dataCollected}/${state.requiredForCollection})`;
+                    phaseClass = 'bg-blue-900/30 text-blue-300';
+                    break;
+                case PHASES.GHOST:
+                    phaseText = `FASE 2: CALIBRACIÓN (${state.ghostHistory.length}/${state.requiredForGhost})`;
+                    phaseClass = 'bg-purple-900/30 text-purple-300';
+                    break;
+                case PHASES.ACTIVE:
+                    phaseText = 'FASE 3: FUEGO REAL';
+                    phaseClass = 'bg-green-900/30 text-green-300';
+                    break;
+                case PHASES.PROTECTION:
+                    phaseText = 'FASE 4: PROTECCIÓN (Recalibrando...)';
+                    phaseClass = 'bg-red-900/30 text-red-300';
+                    break;
+            }
+            
+            phaseElement.textContent = phaseText;
+            phaseElement.className = `phase-indicator ${phaseClass}`;
+            
+            // Actualizar panel de predicción
+            const prediction = state.lastPrediction || { type: 'none', confidence: 0 };
+            const predictionElement = document.getElementById('roulette-prediction-value');
+            const confidenceElement = document.getElementById('roulette-confidence');
+            const betElement = document.getElementById('roulette-bet');
+            const detailsElement = document.getElementById('roulette-prediction-details');
+            
+            if (state.phase === PHASES.ACTIVE && prediction.confidence >= 75) {
+                let predictionText = '';
+                
+                if (prediction.type === 'dozen') {
+                    predictionText = `DOCENA ${prediction.value}`;
+                } else if (prediction.type === 'color') {
+                    predictionText = prediction.value.toUpperCase();
+                } else {
+                    predictionText = 'ESPERAR';
+                }
+                
+                predictionElement.textContent = predictionText;
+                confidenceElement.textContent = `${prediction.confidence}%`;
+                betElement.textContent = `$${state.lastBet}`;
+                
+                detailsElement.textContent = prediction.type === 'none' 
+                    ? 'Sin patrón detectable. Continuar en modo observación.' 
+                    : `Basado en análisis de desviación (${prediction.type})`;
+                
+                // Resaltar el panel de predicción
+                document.getElementById('roulette-prediction').classList.add('glow');
+            } else {
+                predictionElement.textContent = 'ESPERAR';
+                confidenceElement.textContent = `${prediction.confidence}%`;
+                betElement.textContent = '$0';
+                
+                if (state.phase === PHASES.COLLECTION) {
+                    detailsElement.textContent = `Recolectando datos... (${state.dataCollected}/${state.requiredForCollection} números registrados)`;
+                } else if (state.phase === PHASES.GHOST) {
+                    detailsElement.textContent = `Modo Calibración: Validando precisión (${state.ghostHistory.length}/${state.requiredForGhost})`;
+                } else {
+                    detailsElement.textContent = 'Confianza insuficiente para apostar. Continuar en modo observación.';
+                }
+                
+                document.getElementById('roulette-prediction').classList.remove('glow');
+            }
+            
+            // Actualizar estadísticas
+            document.getElementById('roulette-stats-count').textContent = state.dataCollected;
+            document.getElementById('roulette-ghost-accuracy').textContent = `${state.ghostAccuracy || 0}%`;
+            document.getElementById('roulette-dozen-1-count').textContent = state.dozenCounts[0];
+            document.getElementById('roulette-dozen-2-count').textContent = state.dozenCounts[1];
+            document.getElementById('roulette-dozen-3-count').textContent = state.dozenCounts[2];
+        }
+
+        // Actualizar UI de baccarat
+        function updateBaccaratUI() {
+            const state = baccaratState;
+            
+            // Actualizar balances y unidades
+            document.getElementById('baccarat-balance').textContent = state.balance;
+            document.getElementById('baccarat-target').value = state.target;
+            document.getElementById('baccarat-stop-loss').value = state.stopLoss;
+            document.getElementById('baccarat-unit').textContent = state.unit;
+            
+            // Actualizar fase
+            const phaseElement = document.getElementById('baccarat-phase');
+            let phaseText = '';
+            let phaseClass = '';
+            
+            switch (state.phase) {
+                case PHASES.COLLECTION:
+                    phaseText = `FASE 1: RECOLECCIÓN (${state.dataCollected}/${state.requiredForCollection})`;
+                    phaseClass = 'bg-blue-900/30 text-blue-300';
+                    break;
+                case PHASES.GHOST:
+                    phaseText = `FASE 2: CALIBRACIÓN (${state.ghostHistory.length}/${state.requiredForGhost})`;
+                    phaseClass = 'bg-purple-900/30 text-purple-300';
+                    break;
+                case PHASES.ACTIVE:
+                    phaseText = 'FASE 3: FUEGO REAL';
+                    phaseClass = 'bg-green-900/30 text-green-300';
+                    break;
+                case PHASES.PROTECTION:
+                    phaseText = 'FASE 4: PROTECCIÓN (Recalibrando...)';
+                    phaseClass = 'bg-red-900/30 text-red-300';
+                    break;
+            }
+            
+            phaseElement.textContent = phaseText;
+            phaseElement.className = `phase-indicator ${phaseClass}`;
+            
+            // Actualizar patrón detectado
+            document.getElementById('baccarat-pattern').textContent = state.pattern;
+            
+            // Actualizar panel de predicción
+            const prediction = state.lastPrediction || { type: 'none', confidence: 0 };
+            const predictionElement = document.getElementById('baccarat-prediction-value');
+            const confidenceElement = document.getElementById('baccarat-confidence');
+            const betElement = document.getElementById('baccarat-bet');
+            const detailsElement = document.getElementById('baccarat-prediction-details');
+            
+            if (state.phase === PHASES.ACTIVE && prediction.confidence >= 75) {
+                predictionElement.textContent = prediction.value ? prediction.value.toUpperCase() : 'ESPERAR';
+                confidenceElement.textContent = `${prediction.confidence}%`;
+                betElement.textContent = `$${state.lastBet}`;
+                
+                detailsElement.textContent = prediction.type === 'none' 
+                    ? 'Sin patrón detectable. Continuar en modo observación.' 
+                    : `Basado en patrón ${prediction.type}`;
+                
+                // Resaltar el panel de predicción
+                document.getElementById('baccarat-prediction').classList.add('glow');
+            } else {
+                predictionElement.textContent = 'ESPERAR';
+                confidenceElement.textContent = `${prediction.confidence}%`;
+                betElement.textContent = '$0';
+                
+                if (state.phase === PHASES.COLLECTION) {
+                    detailsElement.textContent = `Recolectando datos... (${state.dataCollected}/${state.requiredForCollection} resultados registrados)`;
+                } else if (state.phase === PHASES.GHOST) {
+                    detailsElement.textContent = `Modo Calibración: Validando precisión (${state.ghostHistory.length}/${state.requiredForGhost})`;
+                } else {
+                    detailsElement.textContent = 'Confianza insuficiente para apostar. Continuar en modo observación.';
+                }
+                
+                document.getElementById('baccarat-prediction').classList.remove('glow');
+            }
+            
+            // Actualizar estadísticas
+            document.getElementById('baccarat-stats-count').textContent = state.dataCollected;
+            document.getElementById('baccarat-ghost-accuracy').textContent = `${state.ghostAccuracy || 0}%`;
+            document.getElementById('baccarat-banker-count').textContent = state.distribution.banker;
+            document.getElementById('baccarat-player-count').textContent = state.distribution.player;
+            document.getElementById('baccarat-tie-count').textContent = state.distribution.tie;
+        }
+
+        // Actualizar historial de ruleta
+        function updateRouletteHistory() {
+            const container = document.getElementById('roulette-history');
+            const state = rouletteState;
+            
+            if (!container) return;
+            
+            let html = '';
+            const recentHistory = state.history.slice(0, 20); // Mostrar solo los últimos 20
+            
+            for (const result of recentHistory) {
+                let bgClass = '';
+                let textClass = '';
+                
+                if (result.color === 'red') {
+                    bgClass = 'bg-red-900/50';
+                    textClass = 'text-red-300';
+                } else if (result.color === 'black') {
+                    bgClass = 'bg-gray-900';
+                    textClass = 'text-white';
+                } else {
+                    bgClass = 'bg-green-900/50';
+                    textClass = 'text-green-300';
+                }
+                
+                html += `<div class="history-chip ${bgClass} ${textClass}" title="${new Date(result.timestamp).toLocaleTimeString()}">${result.number}</div>`;
+            }
+            
+            container.innerHTML = html || '<div class="text-gray-500 text-center py-4">No hay datos aún</div>';
+        }
+
+        // Actualizar historial de baccarat
+        function updateBaccaratHistory() {
+            const container = document.getElementById('baccarat-history');
+            const state = baccaratState;
+            
+            if (!container) return;
+            
+            let html = '';
+            const recentHistory = state.history.slice(0, 20); // Mostrar solo los últimos 20
+            
+            for (const result of recentHistory) {
+                let bgClass = '';
+                let textClass = '';
+                let letter = '';
+                
+                if (result.result === 'banker') {
+                    bgClass = 'bg-blue-900/50';
+                    textClass = 'text-blue-300';
+                    letter = 'B';
+                } else if (result.result === 'player') {
+                    bgClass = 'bg-red-900/50';
+                    textClass = 'text-red-300';
+                    letter = 'P';
+                } else {
+                    bgClass = 'bg-gray-900';
+                    textClass = 'text-white';
+                    letter = 'T';
+                }
+                
+                html += `<div class="history-chip ${bgClass} ${textClass}" title="${new Date(result.timestamp).toLocaleTimeString()}">${letter}</div>`;
+            }
+            
+            container.innerHTML = html || '<div class="text-gray-500 text-center py-4">No hay datos aún</div>';
+        }
+
+        // Inicializar aplicación cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
