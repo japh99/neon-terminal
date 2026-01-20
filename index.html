@@ -156,6 +156,11 @@
             background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 142, 107, 0.1));
             border: 2px solid #ff6b6b;
         }
+        
+        .calibration-phase { background: linear-gradient(135deg, rgba(255, 217, 61, 0.1), rgba(255, 193, 7, 0.1)); border-color: #ffd93d; }
+        .ghost-phase { background: linear-gradient(135deg, rgba(155, 81, 224, 0.1), rgba(103, 58, 183, 0.1)); border-color: #9b51e0; }
+        .active-phase { background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 200, 83, 0.1)); border-color: var(--neon-green); }
+        .protection-phase { background: linear-gradient(135deg, rgba(255, 87, 87, 0.1), rgba(244, 67, 54, 0.1)); border-color: #ff5757; }
     </style>
 </head>
 <body class="min-h-screen p-4">
@@ -238,7 +243,6 @@
                     
                     <div class="text-gray-300 mb-3">Composición de fichas:</div>
                     <div id="chipComposition" class="flex flex-wrap justify-center gap-2 mb-6">
-                        <!-- Las fichas se generarán dinámicamente -->
                         <div class="text-gray-500 text-center py-4">Ingresa números para calcular la apuesta</div>
                     </div>
                     
@@ -352,7 +356,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-4 sm:grid-cols-7 md:grid-cols-8 lg:grid-cols-9 gap-3">
+                    <div class="grid grid-cols-4 sm:grid-cols-7 md:grid-cols-8 lg:grid-cols-9 gap-3" id="keyboardContainer">
                         <!-- Los botones del 0 al 36 se generarán dinámicamente -->
                     </div>
                     
@@ -388,7 +392,6 @@
                                 </tr>
                             </thead>
                             <tbody id="historyBody">
-                                <!-- Las filas se generarán dinámicamente -->
                                 <tr>
                                     <td colspan="8" class="text-center py-8 text-gray-500">No hay historial aún. Ingresa números para comenzar.</td>
                                 </tr>
@@ -412,329 +415,74 @@
         </footer>
     </div>
 
+    <!-- Cargar el cerebro matemático -->
+    <script src="brain.js"></script>
+    
     <script>
         // ============================================
-        // CEREBRO MATEMÁTICO V2.0 - MOTOR DE PROBABILIDAD
+        // INTERFAZ DE USUARIO - CONTROLADOR
         // ============================================
-        const NEON_BRAIN = {
-            // Configuración de la estrategia
-            config: {
-                windowSize: 37, // Analizar últimos 37 tiros (ciclo completo de ruleta)
-                minConfidence: 75, // Solo apostar si la confianza > 75%
-                baseUnit: 100, // Apuesta base inicial
-            },
-
-            // Estado interno del cerebro
-            brainState: {
-                currentBetLevel: 1, // Para D'Alembert
-                lastOutcome: null, // 'WIN' o 'LOSS'
-                cycleHistory: [], // Historial del ciclo actual
-                accuracyHistory: [], // Historial de precisión
-            },
-
-            /**
-             * ANALIZAR EL CILINDRO Y GENERAR PREDICCIÓN
-             * @param {Array} history - Array de números [12, 5, 0, ...]
-             * @returns {Object} Predicción con docena, confianza y razón
-             */
-            analyze: function(history) {
-                // Necesitamos al menos 10 números para empezar a analizar
-                if (history.length < 10) {
-                    return {
-                        dozen: null,
-                        confidence: 0,
-                        reason: "Recopilando datos (" + history.length + "/10)...",
-                        numbers: [],
-                        hotDozen: null,
-                        coldDozen: null
-                    };
-                }
-
-                // 1. Cortar el historial a la ventana de análisis (últimos 37 tiros)
-                const recentHistory = history.slice(0, this.config.windowSize);
-                
-                // 2. Contar frecuencias de Docenas (1-3) e identificar el cero
-                let dozenCounts = { 1: 0, 2: 0, 3: 0 };
-                let zeroCount = 0;
-                let lastAppearance = { 1: 999, 2: 999, 3: 999 }; // Turnos sin salir
-
-                recentHistory.forEach((num, index) => {
-                    if (num === 0) {
-                        zeroCount++;
-                        return;
-                    }
-                    
-                    let dozen = Math.ceil(num / 12);
-                    if (dozen >= 1 && dozen <= 3) {
-                        dozenCounts[dozen]++;
-                        
-                        // Registrar cuándo fue la última vez que salió (menor índice = más reciente)
-                        if (lastAppearance[dozen] === 999) lastAppearance[dozen] = index;
-                    }
-                });
-
-                // 3. Calcular estadísticas de desviación
-                const totalNonZero = recentHistory.length - zeroCount;
-                const expectedPerDozen = totalNonZero / 3; // Ley del Tercio
-                
-                // 4. Calcular Puntaje de Probabilidad (Score)
-                // Fórmula: Ponderación por déficit + retraso + desviación estándar
-                let scores = { 1: 0, 2: 0, 3: 0 };
-                let deviationFactors = { 1: 0, 2: 0, 3: 0 };
-
-                for (let d = 1; d <= 3; d++) {
-                    // Factor A: Déficit de Frecuencia (Si salió poco, suma puntos)
-                    let deficit = expectedPerDozen - dozenCounts[d];
-                    scores[d] += (deficit * 15); 
-
-                    // Factor B: Retraso (Si hace mucho no sale, suma puntos exponencialmente)
-                    if (lastAppearance[d] > 5) {
-                        let delayBonus = Math.min(50, lastAppearance[d] * 3);
-                        scores[d] += delayBonus;
-                    }
-                    
-                    // Factor C: Penalización por salida reciente (evitar repetición inmediata)
-                    if (lastAppearance[d] === 0) scores[d] -= 25;
-                    
-                    // Factor D: Desviación estándar ponderada
-                    deviationFactors[d] = Math.abs(dozenCounts[d] - expectedPerDozen) / expectedPerDozen;
-                    scores[d] += (deviationFactors[d] * 30);
-                }
-
-                // 5. Determinar Ganador (docena con mayor puntaje)
-                let bestDozen = 1;
-                let bestScore = scores[1];
-                
-                for (let d = 2; d <= 3; d++) {
-                    if (scores[d] > bestScore) {
-                        bestScore = scores[d];
-                        bestDozen = d;
-                    }
-                }
-
-                // 6. Calcular Confianza (0-100%)
-                // Normalizamos el score basándonos en una escala logarítmica
-                let confidence = 0;
-                if (bestScore > 0) {
-                    // Fórmula: 40% base + 60% según puntaje normalizado
-                    let normalizedScore = Math.min(100, bestScore / 2);
-                    confidence = 40 + (normalizedScore * 0.6);
-                }
-                
-                // Ajustar confianza según desviación
-                confidence = Math.min(95, Math.max(20, confidence));
-
-                // 7. Determinar docena caliente y fría
-                let hotDozen = 1;
-                let maxCount = dozenCounts[1];
-                let coldDozen = 1;
-                let minCount = dozenCounts[1];
-                
-                for (let d = 2; d <= 3; d++) {
-                    if (dozenCounts[d] > maxCount) {
-                        maxCount = dozenCounts[d];
-                        hotDozen = d;
-                    }
-                    if (dozenCounts[d] < minCount) {
-                        minCount = dozenCounts[d];
-                        coldDozen = d;
-                    }
-                }
-
-                // 8. Generar números recomendados para la docena predicha
-                let recommendedNumbers = this.getHotNumbersInDozen(recentHistory, bestDozen);
-
-                return {
-                    dozen: parseInt(bestDozen),
-                    confidence: Math.round(confidence),
-                    reason: `Déficit: ${dozenCounts[bestDozen]} vs Esperado: ${Math.round(expectedPerDozen)} | Retraso: ${lastAppearance[bestDozen]} giros`,
-                    numbers: recommendedNumbers,
-                    hotDozen: hotDozen,
-                    coldDozen: coldDozen,
-                    stats: {
-                        counts: dozenCounts,
-                        lastAppearance: lastAppearance,
-                        expected: expectedPerDozen,
-                        scores: scores
-                    }
-                };
-            },
-
-            /**
-             * GESTIÓN DE CAPITAL (D'ALEMBERT MEJORADO)
-             * @param {Boolean} won - Si ganó el último tiro
-             * @param {Number} currentBalance - Saldo actual
-             * @param {Number} baseBet - Apuesta base
-             * @returns {Number} Próxima apuesta calculada
-             */
-            calculateNextBet: function(won, currentBalance, baseBet = null) {
-                const base = baseBet || this.config.baseUnit;
-                
-                if (won) {
-                    // Si gana, bajamos 1 nivel (mínimo 1)
-                    this.brainState.currentBetLevel = Math.max(1, this.brainState.currentBetLevel - 1);
-                    this.brainState.lastOutcome = 'WIN';
-                    
-                    // Registrar acierto
-                    this.brainState.accuracyHistory.push(1);
-                } else {
-                    // Si pierde, subimos 1 nivel
-                    this.brainState.currentBetLevel++;
-                    this.brainState.lastOutcome = 'LOSS';
-                    
-                    // Registrar fallo
-                    this.brainState.accuracyHistory.push(0);
-                }
-                
-                // Limitar historial de precisión a los últimos 50
-                if (this.brainState.accuracyHistory.length > 50) {
-                    this.brainState.accuracyHistory.shift();
-                }
-                
-                // Calcular apuesta: nivel * base * factor de seguridad
-                let calculatedBet = this.brainState.currentBetLevel * base;
-                
-                // Factor de seguridad: nunca apostar más del 5% del saldo
-                const maxBet = currentBalance * 0.05;
-                if (calculatedBet > maxBet) {
-                    calculatedBet = Math.max(base, maxBet);
-                }
-                
-                // Asegurar apuesta mínima
-                calculatedBet = Math.max(base, calculatedBet);
-                
-                return Math.round(calculatedBet);
-            },
-
-            /**
-             * Calcular precisión actual del sistema
-             * @returns {Number} Precisión en porcentaje
-             */
-            calculateAccuracy: function() {
-                if (this.brainState.accuracyHistory.length === 0) return 0;
-                
-                const hits = this.brainState.accuracyHistory.filter(v => v === 1).length;
-                return Math.round((hits / this.brainState.accuracyHistory.length) * 100);
-            },
-
-            /**
-             * Reiniciar progresión D'Alembert
-             */
-            resetProgression: function() {
-                this.brainState.currentBetLevel = 1;
-                this.brainState.lastOutcome = null;
-            },
-
-            /**
-             * Helper: Busca qué números de una docena específica están saliendo más
-             */
-            getHotNumbersInDozen: function(history, dozen) {
-                let numberCounts = {};
-                
-                // Contar frecuencia de cada número en la docena
-                history.forEach(n => {
-                    if (n !== 0 && Math.ceil(n/12) === dozen) {
-                        numberCounts[n] = (numberCounts[n] || 0) + 1;
-                    }
-                });
-                
-                // Ordenar por frecuencia y devolver los top 4
-                let sortedNumbers = Object.keys(numberCounts)
-                    .sort((a,b) => numberCounts[b] - numberCounts[a])
-                    .slice(0, 4)
-                    .map(Number);
-                
-                // Si no hay suficientes datos, devolver números aleatorios de la docena
-                if (sortedNumbers.length < 3) {
-                    let start = (dozen - 1) * 12 + 1;
-                    let allNumbers = [];
-                    for(let i = 0; i < 12; i++) allNumbers.push(start + i);
-                    
-                    // Mezclar y tomar 4
-                    allNumbers = allNumbers.sort(() => Math.random() - 0.5);
-                    return allNumbers.slice(0, 4);
-                }
-                
-                return sortedNumbers;
-            },
-
-            /**
-             * Verificar si el sistema está listo para fase activa
-             * @param {Number} minSpins - Mínimo de tiros de prueba
-             * @param {Number} requiredAccuracy - Precisión requerida
-             * @returns {Boolean} True si está listo
-             */
-            isReadyForActivePhase: function(minSpins = 10, requiredAccuracy = 75) {
-                if (this.brainState.accuracyHistory.length < minSpins) return false;
-                
-                const accuracy = this.calculateAccuracy();
-                return accuracy >= requiredAccuracy;
-            }
-        };
-
-        // ============================================
-        // ESTADO DE LA APLICACIÓN
-        // ============================================
-        const state = {
-            phase: 1, // 1: Recolección, 2: Calibración, 3: Fuego Real, 4: Protección
-            balance: 10000,
-            initialBalance: 10000,
-            profitTarget: 15000,
-            stopLoss: 5000,
-            currentBet: 0,
-            numbers: [],
-            history: [],
-            predictions: [],
-            consecutiveLosses: 0,
-            unitSize: 0,
-            currentPrediction: null,
-            lastPredictionResult: null
-        };
-
+        
         // Valores de fichas disponibles
         const chipValues = [500, 2500, 5000, 25000, 100000, 500000, 1200000, 5000000];
-
-        // Colores de la ruleta (0 es verde, otros según reglas europeas)
+        
+        // Colores de la ruleta
         const rouletteColors = {
             0: 'green',
             32: 'red', 19: 'red', 21: 'red', 25: 'red', 34: 'red', 27: 'red', 36: 'red', 30: 'red', 23: 'red', 5: 'red', 16: 'red', 1: 'red', 14: 'red', 9: 'red', 18: 'red', 7: 'red', 12: 'red', 3: 'red',
             15: 'black', 4: 'black', 2: 'black', 17: 'black', 6: 'black', 13: 'black', 11: 'black', 8: 'black', 10: 'black', 24: 'black', 33: 'black', 20: 'black', 31: 'black', 22: 'black', 29: 'black', 28: 'black', 35: 'black', 26: 'black'
         };
 
-        // Mapeo de números a docenas
-        const numberToDozen = (number) => {
-            if (number === 0) return 0; // El cero no pertenece a ninguna docena
-            return Math.ceil(number / 12);
+        // Estado de la interfaz
+        const uiState = {
+            lastNumber: null,
+            history: [],
+            chipComposition: []
         };
 
         // ============================================
         // INICIALIZACIÓN
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar cerebro matemático con saldo inicial
+            NEON_CORE.init(10000);
+            
+            // Cargar estado guardado
             loadState();
+            
+            // Crear teclado numérico
             initializeKeyboard();
+            
+            // Actualizar interfaz
             updateUI();
+            
+            // Configurar event listeners
             setupEventListeners();
         });
 
         // Cargar estado desde localStorage
         function loadState() {
-            const savedState = localStorage.getItem('neonRouletteState');
+            const savedState = localStorage.getItem('neonRouletteUIState');
             if (savedState) {
                 const parsed = JSON.parse(savedState);
-                Object.assign(state, parsed);
-                console.log('Estado cargado desde localStorage');
+                Object.assign(uiState, parsed);
+                
+                // Restaurar historial en el cerebro
+                if (uiState.history.length > 0) {
+                    // El cerebro ya maneja su propio historial, así que solo actualizamos UI
+                    console.log('Estado de UI cargado desde localStorage');
+                }
             }
         }
 
         // Guardar estado en localStorage
         function saveState() {
-            localStorage.setItem('neonRouletteState', JSON.stringify(state));
+            localStorage.setItem('neonRouletteUIState', JSON.stringify(uiState));
         }
 
         // Inicializar teclado numérico
         function initializeKeyboard() {
-            const keyboard = document.querySelector('.grid.gap-3');
+            const keyboard = document.getElementById('keyboardContainer');
             keyboard.innerHTML = '';
             
             // Botón para el 0 (verde)
@@ -754,7 +502,7 @@
             button.dataset.number = number;
             
             button.addEventListener('click', () => {
-                addNumber(number);
+                processNumber(number);
             });
             
             container.appendChild(button);
@@ -788,247 +536,112 @@
         }
 
         // ============================================
-        // LÓGICA DE NEGOCIO CON CEREBRO MATEMÁTICO
+        // FUNCIONES PRINCIPALES DE LA INTERFAZ
         // ============================================
 
-        // Añadir número al historial
-        function addNumber(number) {
-            // Registrar número
-            state.numbers.unshift(number); // Añadir al inicio para historial reciente primero
+        // Procesar un número (conexión con el cerebro)
+        function processNumber(number) {
+            // Guardar número actual
+            uiState.lastNumber = number;
             
-            // Obtener predicción del cerebro matemático
-            const prediction = NEON_BRAIN.analyze(state.numbers);
-            state.currentPrediction = prediction;
+            // Enviar al cerebro para procesamiento
+            const result = NEON_CORE.processSpin(number);
             
-            let hit = false;
-            let betAmount = 0;
-            let resultMessage = "";
-            
-            // Determinar docena del número
-            const actualDozen = numberToDozen(number);
-            
-            if (state.phase === 1) {
-                // Fase 1: Solo recolección
-                resultMessage = `Número ${number} registrado. ${state.numbers.length}/37 para calibración.`;
-                
-                if (state.numbers.length >= 37) {
-                    state.phase = 2;
-                    resultMessage = "¡Datos iniciales completados! Pasando a FASE 2: CALIBRACIÓN.";
-                }
-            } 
-            else if (state.phase === 2) {
-                // Fase 2: Calibración (Ghost Mode)
-                if (prediction.dozen && prediction.confidence > 0) {
-                    // Verificar si acertó
-                    hit = (prediction.dozen === actualDozen && actualDozen !== 0);
-                    
-                    // Registrar resultado en el cerebro
-                    NEON_BRAIN.brainState.accuracyHistory.push(hit ? 1 : 0);
-                    
-                    // Verificar si pasa a fase 3
-                    if (NEON_BRAIN.isReadyForActivePhase(10, 75)) {
-                        state.phase = 3;
-                        NEON_BRAIN.resetProgression();
-                        resultMessage = `¡Calibración exitosa! Precisión: ${NEON_BRAIN.calculateAccuracy()}%. Pasando a FASE 3: FUEGO REAL.`;
-                    } else {
-                        resultMessage = `Calibrando... Precisión: ${NEON_BRAIN.calculateAccuracy()}% (${NEON_BRAIN.brainState.accuracyHistory.filter(v => v === 1).length}/${NEON_BRAIN.brainState.accuracyHistory.length} aciertos)`;
-                    }
-                } else {
-                    resultMessage = "Analizando patrones...";
-                }
-            } 
-            else if (state.phase === 3 || state.phase === 4) {
-                // Fase 3 y 4: Modo activo con apuestas reales
-                if (prediction.dozen && prediction.confidence >= NEON_BRAIN.config.minConfidence) {
-                    // Calcular apuesta usando D'Alembert
-                    const lastWon = state.lastPredictionResult === 'WIN';
-                    betAmount = NEON_BRAIN.calculateNextBet(lastWon, state.balance, state.balance * 0.01);
-                    state.currentBet = betAmount;
-                    
-                    // Verificar si acertó
-                    hit = (prediction.dozen === actualDozen && actualDozen !== 0);
-                    
-                    // Actualizar saldo
-                    if (hit) {
-                        // Ganar: apostar a una docena paga 2:1
-                        const winAmount = betAmount * 2;
-                        state.balance += winAmount;
-                        state.consecutiveLosses = 0;
-                        state.lastPredictionResult = 'WIN';
-                        resultMessage = `¡ACIERTO! +$${winAmount.toLocaleString()}`;
-                    } else {
-                        // Perder
-                        state.balance -= betAmount;
-                        state.consecutiveLosses++;
-                        state.lastPredictionResult = 'LOSS';
-                        resultMessage = `Fallo. -$${betAmount.toLocaleString()}`;
-                        
-                        // El cero no afecta la progresión D'Alembert
-                        if (number === 0) {
-                            resultMessage = `Cero (0). Pérdida congelada. -$${betAmount.toLocaleString()}`;
-                        }
-                        
-                        // Verificar si pasa a fase de protección
-                        if (state.consecutiveLosses >= 3) {
-                            state.phase = 4;
-                            resultMessage += " ¡3 pérdidas consecutivas! Activando FASE 4: PROTECCIÓN.";
-                        }
-                    }
-                    
-                    // Verificar stop loss y profit target
-                    if (state.balance <= state.stopLoss) {
-                        resultMessage = "¡STOP LOSS ALCANZADO! Reiniciando sistema.";
-                        resetToPhase1();
-                    } else if (state.balance >= state.profitTarget) {
-                        resultMessage = "¡META DE GANANCIA ALCANZADA! ¡FELICIDADES!";
-                    }
-                    
-                    // Si está en fase 4 y acertó, volver a fase 3
-                    if (state.phase === 4 && hit) {
-                        state.phase = 3;
-                        state.consecutiveLosses = 0;
-                        resultMessage += " ¡Acierto en protección! Volviendo a FASE 3.";
-                    }
-                } else {
-                    // Confianza insuficiente, no apostar
-                    betAmount = 0;
-                    resultMessage = `Confianza insuficiente (${prediction.confidence}%). Esperando mejor oportunidad.`;
-                }
-            }
-            
-            // Registrar en historial
+            // Guardar en historial de UI
             const historyEntry = {
-                number,
-                color: rouletteColors[number],
-                dozen: actualDozen,
-                prediction: prediction.dozen,
-                confidence: prediction.confidence,
-                hit,
-                bet: betAmount,
-                balance: state.balance,
-                phase: state.phase,
-                result: resultMessage,
-                timestamp: new Date().toLocaleTimeString()
+                number: number,
+                result: result,
+                timestamp: new Date().toLocaleTimeString(),
+                color: rouletteColors[number]
             };
             
-            state.history.unshift(historyEntry);
+            uiState.history.unshift(historyEntry);
             
             // Guardar estado y actualizar UI
             saveState();
             updateUI();
-            updatePhaseMessage(resultMessage);
             
-            // Efecto visual en el botón del número
-            const button = document.querySelector(`button[data-number="${number}"]`);
-            if (button) {
-                button.classList.add('neon-glow');
-                setTimeout(() => button.classList.remove('neon-glow'), 1000);
-            }
+            // Mostrar efecto visual en el botón
+            highlightNumberButton(number);
+            
+            // Mostrar mensaje según resultado
+            showResultMessage(result, number);
         }
 
-        // ============================================
-        // ACTUALIZACIÓN DE UI
-        // ============================================
+        // Actualizar toda la interfaz
         function updateUI() {
+            // Obtener estado actual del cerebro
+            const coreState = NEON_CORE.getState();
+            
             // Actualizar contadores
-            document.getElementById('numbersEnteredCount').textContent = state.numbers.length;
-            document.getElementById('totalSpins').textContent = state.history.length;
+            document.getElementById('numbersEnteredCount').textContent = coreState.history.length;
+            document.getElementById('totalSpins').textContent = coreState.history.length;
             
             // Actualizar barra de progreso de números
-            const numbersProgress = Math.min(100, (state.numbers.length / 37) * 100);
+            const numbersProgress = Math.min(100, (coreState.history.length / 37) * 100);
             document.getElementById('numbersProgress').style.width = numbersProgress + '%';
             
-            // Actualizar saldo y precisión
-            document.getElementById('currentBalance').textContent = '$' + state.balance.toLocaleString();
+            // Actualizar saldo
+            document.getElementById('currentBalance').textContent = '$' + coreState.balance.toLocaleString();
             
-            // Calcular precisión del cerebro
-            const accuracy = NEON_BRAIN.calculateAccuracy();
+            // Actualizar precisión
+            const accuracy = NEON_CORE.getAccuracy();
             document.getElementById('accuracy').textContent = accuracy + '%';
             
             // Actualizar fase
-            updatePhaseDisplay();
+            updatePhaseDisplay(coreState.phase);
             
             // Actualizar progreso hacia la meta
-            updateProgressBar();
+            updateProgressBar(coreState.balance);
             
             // Actualizar predicciones
-            updatePredictions();
+            updatePredictions(coreState);
             
             // Actualizar apuesta y fichas
-            updateBetDisplay();
+            updateBetDisplay(coreState.currentBet);
             
             // Actualizar historial
             updateHistory();
             
-            // Actualizar estadísticas de docenas
-            updateDozenStatsDisplay();
+            // Actualizar estadísticas
+            updateStatsDisplay(coreState);
         }
 
         // Actualizar visualización de fase
-        function updatePhaseDisplay() {
+        function updatePhaseDisplay(phase) {
             const phaseNames = {
-                1: 'Fase 1: Recolección',
-                2: 'Fase 2: Calibración',
-                3: 'Fase 3: Fuego Real',
-                4: 'Fase 4: Protección'
+                'CALIBRATION': 'Fase 1: Recolección',
+                'GHOST': 'Fase 2: Calibración',
+                'ACTIVE': 'Fase 3: Fuego Real',
+                'PROTECTION': 'Fase 4: Protección'
+            };
+            
+            const phaseColors = {
+                'CALIBRATION': 'text-red-400',
+                'GHOST': 'text-yellow-400',
+                'ACTIVE': 'text-green-400',
+                'PROTECTION': 'text-orange-400'
             };
             
             const phaseElement = document.getElementById('currentPhase');
-            phaseElement.textContent = phaseNames[state.phase];
-            
-            // Color según fase
-            if (state.phase === 1) phaseElement.className = "text-xl font-bold text-red-400";
-            else if (state.phase === 2) phaseElement.className = "text-xl font-bold text-yellow-400";
-            else if (state.phase === 3) phaseElement.className = "text-xl font-bold text-green-400";
-            else phaseElement.className = "text-xl font-bold text-orange-400";
-        }
-
-        // Actualizar mensaje de fase en UI
-        function updatePhaseMessage(message) {
-            const phaseMessageElement = document.getElementById('phaseMessage');
-            
-            // Determinar clase según fase y tipo de mensaje
-            let messageClass = "p-4 rounded-lg border ";
-            if (message.includes("ACIERTO") || message.includes("META")) {
-                messageClass += "prediction-high";
-            } else if (message.includes("Fallo") || message.includes("Pérdida")) {
-                messageClass += "prediction-low";
-            } else if (state.phase === 1) {
-                messageClass += "bg-blue-900/30 border-blue-700";
-            } else if (state.phase === 2) {
-                messageClass += "bg-yellow-900/30 border-yellow-700";
-            } else if (state.phase === 3) {
-                messageClass += "bg-green-900/30 border-green-700";
-            } else {
-                messageClass += "bg-red-900/30 border-red-700";
-            }
-            
-            phaseMessageElement.className = `${messageClass} mt-6 fade-in`;
-            phaseMessageElement.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-info-circle ${state.phase === 3 ? 'text-green-400' : state.phase === 4 ? 'text-red-400' : 'text-cyan-400'} mr-3 text-xl"></i>
-                    <div>
-                        <div class="font-bold ${state.phase === 3 ? 'text-green-400' : state.phase === 4 ? 'text-red-400' : 'text-cyan-400'}">${document.getElementById('currentPhase').textContent}</div>
-                        <div class="text-gray-300">${message}</div>
-                    </div>
-                </div>
-            `;
+            phaseElement.textContent = phaseNames[phase] || phase;
+            phaseElement.className = `text-xl font-bold ${phaseColors[phase] || 'text-gray-400'}`;
         }
 
         // Actualizar barra de progreso hacia la meta
-        function updateProgressBar() {
+        function updateProgressBar(currentBalance) {
             const progressFill = document.getElementById('progressFill');
             const currentProgress = document.getElementById('currentProgress');
             const targetProgress = document.getElementById('targetProgress');
             
-            const start = state.initialBalance;
-            const target = state.profitTarget;
-            const current = state.balance;
+            const initialCapital = parseInt(document.getElementById('initialCapital').value) || 10000;
+            const profitTarget = parseInt(document.getElementById('profitTarget').value) || 15000;
+            const current = currentBalance;
             
             // Calcular progreso normalizado (0% a 100%)
             let progressPercent = 0;
-            if (target > start) {
-                progressPercent = ((current - start) / (target - start)) * 100;
+            if (profitTarget > initialCapital) {
+                progressPercent = ((current - initialCapital) / (profitTarget - initialCapital)) * 100;
             }
             
             // Limitar entre 0% y 100%
@@ -1036,24 +649,27 @@
             
             progressFill.style.width = progressPercent + '%';
             currentProgress.textContent = '$' + current.toLocaleString();
-            targetProgress.textContent = '$' + target.toLocaleString();
+            targetProgress.textContent = '$' + profitTarget.toLocaleString();
         }
 
         // Actualizar predicciones en UI
-        function updatePredictions() {
+        function updatePredictions(coreState) {
+            // Obtener predicción actual
+            const prediction = NEON_CORE.getCurrentPrediction();
+            
             // Actualizar docena predicha
             const predictedDozenElement = document.getElementById('predictedDozen');
             const confidenceElement = document.getElementById('confidenceLevel');
             
-            if (state.currentPrediction && state.currentPrediction.dozen) {
-                predictedDozenElement.textContent = `Docena ${state.currentPrediction.dozen}`;
-                confidenceElement.textContent = `${state.currentPrediction.confidence}%`;
+            if (prediction && prediction.dozen) {
+                predictedDozenElement.textContent = `Docena ${prediction.dozen}`;
+                confidenceElement.textContent = `${prediction.confidence || 0}%`;
                 
                 // Color según confianza
-                if (state.currentPrediction.confidence >= 75) {
+                if (prediction.confidence >= 75) {
                     predictedDozenElement.className = "text-4xl font-bold text-green-400 text-center py-4 pulse";
                     confidenceElement.className = "text-4xl font-bold text-green-400 text-center py-4";
-                } else if (state.currentPrediction.confidence >= 50) {
+                } else if (prediction.confidence >= 50) {
                     predictedDozenElement.className = "text-4xl font-bold text-yellow-400 text-center py-4";
                     confidenceElement.className = "text-4xl font-bold text-yellow-400 text-center py-4";
                 } else {
@@ -1069,8 +685,8 @@
             
             // Actualizar números recomendados
             const recommendedNumbersElement = document.getElementById('recommendedNumbers');
-            if (state.currentPrediction && state.currentPrediction.numbers && state.currentPrediction.numbers.length > 0) {
-                recommendedNumbersElement.textContent = state.currentPrediction.numbers.join(', ');
+            if (prediction && prediction.numbers && prediction.numbers.length > 0) {
+                recommendedNumbersElement.textContent = prediction.numbers.slice(0, 6).join(', ');
                 recommendedNumbersElement.className = "text-xl font-bold text-center py-2 text-green-400";
             } else {
                 recommendedNumbersElement.textContent = "Esperando datos...";
@@ -1078,19 +694,22 @@
             }
         }
 
-        // Actualizar estadísticas de docenas en UI
-        function updateDozenStatsDisplay() {
-            if (state.currentPrediction) {
-                document.getElementById('hotDozen').textContent = state.currentPrediction.hotDozen ? 
-                    `Docena ${state.currentPrediction.hotDozen}` : "-";
-                document.getElementById('coldDozen').textContent = state.currentPrediction.coldDozen ? 
-                    `Docena ${state.currentPrediction.coldDozen}` : "-";
+        // Actualizar estadísticas en UI
+        function updateStatsDisplay(coreState) {
+            const stats = NEON_CORE.getStats();
+            
+            if (stats) {
+                document.getElementById('hotDozen').textContent = stats.hotDozen ? 
+                    `Docena ${stats.hotDozen}` : "-";
+                document.getElementById('coldDozen').textContent = stats.coldDozen ? 
+                    `Docena ${stats.coldDozen}` : "-";
             }
             
             // Último acierto
             const lastHitElement = document.getElementById('lastHit');
-            if (state.history.length > 0) {
-                const lastHit = state.history.find(entry => entry.hit);
+            if (uiState.history.length > 0) {
+                const lastHit = uiState.history.find(entry => 
+                    entry.result && entry.result.lastResult && entry.result.lastResult.won);
                 if (lastHit) {
                     lastHitElement.textContent = `#${lastHit.number}`;
                 } else {
@@ -1102,11 +721,13 @@
         }
 
         // Actualizar visualización de apuesta y fichas
-        function updateBetDisplay() {
+        function updateBetDisplay(currentBet) {
             // Actualizar monto de apuesta
             const currentBetElement = document.getElementById('currentBet');
-            if (state.phase >= 3 && state.currentBet > 0) {
-                currentBetElement.textContent = '$' + state.currentBet.toLocaleString();
+            const coreState = NEON_CORE.getState();
+            
+            if (coreState.phase === 'ACTIVE' && currentBet > 0) {
+                currentBetElement.textContent = '$' + currentBet.toLocaleString();
                 currentBetElement.className = "text-3xl font-bold neon-cyan text-center";
             } else {
                 currentBetElement.textContent = 'Modo Prueba';
@@ -1114,20 +735,21 @@
             }
             
             // Actualizar composición de fichas
-            updateChipComposition();
+            updateChipComposition(currentBet);
         }
 
         // Actualizar composición de fichas
-        function updateChipComposition() {
+        function updateChipComposition(betAmount) {
             const chipCompositionElement = document.getElementById('chipComposition');
+            const coreState = NEON_CORE.getState();
             
-            if (state.phase < 3 || state.currentBet <= 0) {
+            if (coreState.phase !== 'ACTIVE' || betAmount <= 0) {
                 chipCompositionElement.innerHTML = '<div class="text-gray-500 text-center py-4">Ingresa números para calcular la apuesta</div>';
                 return;
             }
             
             // Calcular qué fichas usar para la apuesta actual
-            let remaining = state.currentBet;
+            let remaining = betAmount;
             const chipsUsed = [];
             
             // Ordenar fichas de mayor a menor valor
@@ -1178,7 +800,7 @@
             const totalHitsElement = document.getElementById('totalHits');
             const hitPercentageElement = document.getElementById('hitPercentage');
             
-            if (state.history.length === 0) {
+            if (uiState.history.length === 0) {
                 historyBody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">No hay historial aún. Ingresa números para comenzar.</td></tr>';
                 totalHitsElement.textContent = '0';
                 hitPercentageElement.textContent = '0';
@@ -1186,22 +808,31 @@
             }
             
             // Calcular estadísticas
-            const totalHits = state.history.filter(entry => entry.hit).length;
-            const hitPercentage = state.history.length > 0 ? ((totalHits / state.history.length) * 100).toFixed(1) : '0';
+            const totalHits = uiState.history.filter(entry => 
+                entry.result && entry.result.lastResult && entry.result.lastResult.won).length;
+            const hitPercentage = uiState.history.length > 0 ? 
+                ((totalHits / uiState.history.length) * 100).toFixed(1) : '0';
             
             totalHitsElement.textContent = totalHits;
             hitPercentageElement.textContent = hitPercentage;
             
-            // Generar filas de historial (mostrar las últimas 20)
-            const recentHistory = state.history.slice(0, 20);
+            // Generar filas de historial (mostrar las últimas 15)
+            const recentHistory = uiState.history.slice(0, 15);
             historyBody.innerHTML = '';
             
             recentHistory.forEach((entry, index) => {
                 const row = document.createElement('tr');
                 row.className = `history-item border-b border-gray-800 hover:bg-gray-800/50 ${index % 2 === 0 ? 'bg-gray-900/30' : ''}`;
                 
+                const dozen = entry.number === 0 ? 0 : Math.ceil(entry.number / 12);
+                const prediction = entry.result && entry.result.prediction ? 
+                    `Docena ${entry.result.prediction.dozen || '-'}` : '-';
+                const won = entry.result && entry.result.lastResult ? entry.result.lastResult.won : false;
+                const bet = entry.result ? entry.result.bet : 0;
+                const balance = entry.result ? entry.result.balance : 0;
+                
                 row.innerHTML = `
-                    <td class="py-3">${state.history.length - index}</td>
+                    <td class="py-3">${uiState.history.length - index}</td>
                     <td class="py-3">
                         <span class="inline-block w-8 h-8 rounded-full text-center leading-8 font-bold ${entry.color}-roulette">
                             ${entry.number}
@@ -1210,21 +841,84 @@
                     <td class="py-3">
                         <span class="capitalize">${entry.color}</span>
                     </td>
-                    <td class="py-3">${entry.dozen > 0 ? 'Docena ' + entry.dozen : 'Cero'}</td>
-                    <td class="py-3">${entry.prediction ? 'Docena ' + entry.prediction : '-'}</td>
+                    <td class="py-3">${dozen > 0 ? 'Docena ' + dozen : 'Cero'}</td>
+                    <td class="py-3">${prediction}</td>
                     <td class="py-3">
-                        <span class="${entry.hit ? 'text-green-400' : 'text-red-400'} font-bold">
-                            ${entry.hit ? '✓ ACIERTO' : '✗ FALLO'}
+                        <span class="${won ? 'text-green-400' : 'text-red-400'} font-bold">
+                            ${won ? '✓ ACIERTO' : '✗ FALLO'}
                         </span>
                     </td>
-                    <td class="py-3">${entry.bet ? '$' + entry.bet.toLocaleString() : '-'}</td>
-                    <td class="py-3 ${entry.balance >= state.initialBalance ? 'text-green-400' : 'text-red-400'}">
-                        $${entry.balance.toLocaleString()}
+                    <td class="py-3">${bet > 0 ? '$' + bet.toLocaleString() : '-'}</td>
+                    <td class="py-3 ${balance >= 10000 ? 'text-green-400' : 'text-red-400'}">
+                        $${balance.toLocaleString()}
                     </td>
                 `;
                 
                 historyBody.appendChild(row);
             });
+        }
+
+        // ============================================
+        // FUNCIONES AUXILIARES DE LA INTERFAZ
+        // ============================================
+
+        // Resaltar botón de número
+        function highlightNumberButton(number) {
+            const button = document.querySelector(`button[data-number="${number}"]`);
+            if (button) {
+                button.classList.add('neon-glow');
+                setTimeout(() => button.classList.remove('neon-glow'), 1000);
+            }
+        }
+
+        // Mostrar mensaje de resultado
+        function showResultMessage(result, number) {
+            const phaseMessageElement = document.getElementById('phaseMessage');
+            let message = "";
+            let phaseClass = "";
+            
+            const coreState = NEON_CORE.getState();
+            
+            // Determinar clase según fase
+            switch(coreState.phase) {
+                case 'CALIBRATION':
+                    phaseClass = 'calibration-phase';
+                    message = `Número ${number} registrado. ${coreState.history.length}/37 para calibración.`;
+                    break;
+                case 'GHOST':
+                    phaseClass = 'ghost-phase';
+                    const accuracy = NEON_CORE.getAccuracy();
+                    message = `Calibrando... Precisión: ${accuracy}%`;
+                    break;
+                case 'ACTIVE':
+                    phaseClass = 'active-phase';
+                    if (result.lastResult) {
+                        if (result.lastResult.won) {
+                            message = `¡ACIERTO! +$${(result.lastResult.amount).toLocaleString()}`;
+                        } else {
+                            message = `Fallo. -$${result.bet.toLocaleString()}`;
+                            if (number === 0) {
+                                message = `Cero (0). Pérdida congelada. -$${result.bet.toLocaleString()}`;
+                            }
+                        }
+                    }
+                    break;
+                case 'PROTECTION':
+                    phaseClass = 'protection-phase';
+                    message = "¡3 pérdidas consecutivas! Modo protección activado.";
+                    break;
+            }
+            
+            phaseMessageElement.className = `${phaseClass} p-4 rounded-lg mt-6 fade-in`;
+            phaseMessageElement.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle mr-3 text-xl"></i>
+                    <div>
+                        <div class="font-bold">${document.getElementById('currentPhase').textContent}</div>
+                        <div class="text-gray-300">${message}</div>
+                    </div>
+                </div>
+            `;
         }
 
         // ============================================
@@ -1253,210 +947,152 @@
                 return;
             }
             
-            // Actualizar estado
-            state.initialBalance = initialCapital;
-            state.balance = initialCapital;
-            state.profitTarget = profitTarget;
-            state.stopLoss = stopLoss;
-            
-            // Reiniciar sistema si estaba en fase activa
-            if (state.phase >= 3) {
-                state.phase = 1;
-                state.numbers = [];
-                state.history = [];
-                state.consecutiveLosses = 0;
-                state.currentBet = 0;
-                NEON_BRAIN.resetProgression();
-                NEON_BRAIN.brainState.accuracyHistory = [];
-                updatePhaseMessage("Configuración actualizada. Reiniciando a FASE 1: RECOLECCIÓN.");
-            }
+            // Reiniciar sistema con nueva configuración
+            NEON_CORE.reset();
+            NEON_CORE.init(initialCapital);
+            uiState.history = [];
             
             // Guardar y actualizar
             saveState();
             updateUI();
             
-            // Mostrar confirmación
             alert('Configuración actualizada correctamente');
         }
 
-        // Cambiar crupier (reiniciar sistema)
+        // Cambiar crupier
         function changeDealer() {
-            if (confirm('¿Cambiar de crupier? Esto reiniciará el historial y volverá a la Fase 1, pero mantendrá el saldo actual.')) {
-                // Mantener saldo pero reiniciar todo lo demás
-                const currentBalance = state.balance;
-                
-                // Reiniciar estado (excepto saldo)
-                Object.assign(state, {
-                    phase: 1,
-                    currentBet: 0,
-                    numbers: [],
-                    history: [],
-                    predictions: [],
-                    consecutiveLosses: 0,
-                    currentPrediction: null,
-                    lastPredictionResult: null,
-                    balance: currentBalance
-                });
-                
-                // Reiniciar cerebro matemático
-                NEON_BRAIN.resetProgression();
-                NEON_BRAIN.brainState.accuracyHistory = [];
-                NEON_BRAIN.brainState.cycleHistory = [];
+            if (confirm('¿Cambiar de crupier? Esto reiniciará el historial pero mantendrá el saldo actual.')) {
+                const currentBalance = NEON_CORE.getState().balance;
+                NEON_CORE.reset();
+                NEON_CORE.init(currentBalance);
+                uiState.history = [];
                 
                 saveState();
                 updateUI();
-                updatePhaseMessage("¡Crupier cambiado! Sistema reiniciado. Comienza a ingresar números para la nueva sesión.");
+                
+                const phaseMessageElement = document.getElementById('phaseMessage');
+                phaseMessageElement.className = 'calibration-phase p-4 rounded-lg mt-6 fade-in';
+                phaseMessageElement.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-user-secret mr-3 text-xl"></i>
+                        <div>
+                            <div class="font-bold">¡Crupier Cambiado!</div>
+                            <div class="text-gray-300">Sistema reiniciado. Comienza a ingresar números para la nueva sesión.</div>
+                        </div>
+                    </div>
+                `;
             }
         }
 
         // Deshacer última jugada
         function undoLast() {
-            if (state.numbers.length === 0) {
+            if (uiState.history.length === 0) {
                 alert('No hay números para deshacer');
                 return;
             }
             
-            // Eliminar último número
-            const lastNumber = state.numbers.shift();
+            // Eliminar última entrada
+            uiState.history.shift();
             
-            // Eliminar última entrada del historial si existe
-            if (state.history.length > 0) {
-                const lastEntry = state.history.shift();
-                
-                // Revertir cambios en saldo si estaba en fase activa
-                if (state.phase >= 3 && lastEntry.bet) {
-                    if (lastEntry.hit) {
-                        // Revertir ganancia
-                        state.balance -= lastEntry.bet * 2;
-                        state.consecutiveLosses = Math.max(0, state.consecutiveLosses - 1);
-                    } else {
-                        // Revertir pérdida
-                        state.balance += lastEntry.bet;
-                        state.consecutiveLosses = Math.max(0, state.consecutiveLosses - 1);
-                    }
-                    
-                    // Revertir progresión D'Alembert
-                    if (lastEntry.hit) {
-                        NEON_BRAIN.brainState.currentBetLevel = Math.min(10, NEON_BRAIN.brainState.currentBetLevel + 1);
-                    } else {
-                        NEON_BRAIN.brainState.currentBetLevel = Math.max(1, NEON_BRAIN.brainState.currentBetLevel - 1);
-                    }
-                }
-                
-                // Eliminar del historial de precisión del cerebro
-                if (state.phase >= 2 && NEON_BRAIN.brainState.accuracyHistory.length > 0) {
-                    NEON_BRAIN.brainState.accuracyHistory.pop();
-                }
-            }
+            // Nota: No podemos deshacer fácilmente en el cerebro porque es estado interno
+            // En su lugar, reiniciamos el cerebro y volvemos a procesar todo excepto el último
+            const currentBalance = NEON_CORE.getState().balance;
+            NEON_CORE.reset();
+            NEON_CORE.init(currentBalance);
             
-            // Si después de deshacer tenemos menos de 37 números y estábamos en fase > 1, volver a fase 1
-            if (state.numbers.length < 37 && state.phase > 1) {
-                state.phase = 1;
-            }
-            
-            // Recalcular predicción actual
-            state.currentPrediction = NEON_BRAIN.analyze(state.numbers);
+            // Reprocesar todos los números excepto el último
+            const numbersToReprocess = uiState.history.map(entry => entry.number).reverse();
+            numbersToReprocess.forEach(number => {
+                NEON_CORE.processSpin(number);
+            });
             
             saveState();
             updateUI();
-            updatePhaseMessage("Último número deshecho. Números restantes: " + state.numbers.length);
         }
 
         // Exportar datos como JSON
         function exportData() {
+            const coreState = NEON_CORE.getState();
             const exportObj = {
                 metadata: {
-                    app: "NEON ROULETTE MASTER V2",
+                    app: "NEON ROULETTE MASTER V3",
                     exportDate: new Date().toISOString(),
-                    phase: state.phase,
-                    balance: state.balance,
-                    initialBalance: state.initialBalance,
-                    profitTarget: state.profitTarget,
-                    stopLoss: state.stopLoss,
-                    brainAccuracy: NEON_BRAIN.calculateAccuracy()
+                    phase: coreState.phase,
+                    balance: coreState.balance,
+                    accuracy: NEON_CORE.getAccuracy()
                 },
                 statistics: {
-                    totalSpins: state.numbers.length,
-                    testAccuracy: NEON_BRAIN.calculateAccuracy(),
-                    currentBetLevel: NEON_BRAIN.brainState.currentBetLevel,
-                    recentHistory: state.history.slice(0, 50)
+                    totalSpins: coreState.history.length,
+                    currentBet: coreState.currentBet,
+                    betLevel: coreState.betLevel,
+                    historyCount: uiState.history.length
                 },
-                brainAnalysis: state.currentPrediction,
-                rawData: {
-                    numbers: state.numbers,
-                    fullHistory: state.history
-                }
+                uiHistory: uiState.history
             };
             
             const dataStr = JSON.stringify(exportObj, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
-            const exportFileDefaultName = `neon-roulette-data-${new Date().toISOString().slice(0,10)}.json`;
+            const exportFileDefaultName = `neon-roulette-${new Date().toISOString().slice(0,10)}.json`;
             
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
             
-            updatePhaseMessage("Datos exportados correctamente como " + exportFileDefaultName);
+            // Mostrar mensaje de confirmación
+            const phaseMessageElement = document.getElementById('phaseMessage');
+            phaseMessageElement.className = 'active-phase p-4 rounded-lg mt-6 fade-in';
+            phaseMessageElement.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-file-export mr-3 text-xl"></i>
+                    <div>
+                        <div class="font-bold">Datos Exportados</div>
+                        <div class="text-gray-300">Archivo guardado como: ${exportFileDefaultName}</div>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => updateUI(), 3000);
         }
 
-        // Limpiar todo (reinicio completo)
+        // Limpiar todo
         function clearAll() {
-            if (confirm('¿Reiniciar completamente el sistema? Esto borrará todos los datos y restablecerá el saldo inicial.')) {
-                // Restablecer estado completamente
-                Object.assign(state, {
-                    phase: 1,
-                    balance: parseInt(document.getElementById('initialCapital').value) || 10000,
-                    initialBalance: parseInt(document.getElementById('initialCapital').value) || 10000,
-                    profitTarget: parseInt(document.getElementById('profitTarget').value) || 15000,
-                    stopLoss: parseInt(document.getElementById('stopLoss').value) || 5000,
-                    currentBet: 0,
-                    numbers: [],
-                    history: [],
-                    predictions: [],
-                    consecutiveLosses: 0,
-                    currentPrediction: null,
-                    lastPredictionResult: null
-                });
+            if (confirm('¿Reiniciar completamente el sistema? Esto borrará todos los datos.')) {
+                const initialCapital = parseInt(document.getElementById('initialCapital').value) || 10000;
                 
-                // Reiniciar cerebro matemático
-                NEON_BRAIN.resetProgression();
-                NEON_BRAIN.brainState.accuracyHistory = [];
-                NEON_BRAIN.brainState.cycleHistory = [];
+                NEON_CORE.reset();
+                NEON_CORE.init(initialCapital);
+                uiState.history = [];
+                uiState.lastNumber = null;
                 
                 saveState();
                 updateUI();
-                updatePhaseMessage("Sistema reiniciado completamente. Comienza a ingresar números.");
+                
+                const phaseMessageElement = document.getElementById('phaseMessage');
+                phaseMessageElement.className = 'calibration-phase p-4 rounded-lg mt-6 fade-in';
+                phaseMessageElement.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-trash-alt mr-3 text-xl"></i>
+                        <div>
+                            <div class="font-bold">Sistema Reiniciado</div>
+                            <div class="text-gray-300">Todos los datos han sido borrados. Comienza a ingresar números.</div>
+                        </div>
+                    </div>
+                `;
             }
         }
 
         // Simular número aleatorio
         function simulateRandom() {
             const randomNumber = Math.floor(Math.random() * 37); // 0-36
-            addNumber(randomNumber);
-        }
-
-        // Reiniciar a fase 1
-        function resetToPhase1() {
-            state.phase = 1;
-            state.numbers = [];
-            state.history = [];
-            state.consecutiveLosses = 0;
-            state.currentBet = 0;
-            state.balance = state.initialBalance;
-            
-            NEON_BRAIN.resetProgression();
-            NEON_BRAIN.brainState.accuracyHistory = [];
-            
-            saveState();
-            updateUI();
+            processNumber(randomNumber);
         }
 
         // ============================================
         // INICIALIZACIÓN FINAL
         // ============================================
-        // Asegurar que la UI esté actualizada
+        // Guardar estado antes de cerrar
         window.addEventListener('beforeunload', saveState);
     </script>
 </body>
